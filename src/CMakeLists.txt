@@ -11,6 +11,8 @@ qt_add_library(openide SHARED
     KeywordDictionary.cpp
     ProjectTree.cpp
     SyntaxHighlighter.cpp
+    SyntaxHighlighter.cpp ProjectTree.cpp MainWindow.hpp MainWindow.cpp main.cpp KeywordDictionary.cpp FileType.cpp FileMenu.cpp CodeTabPane.cpp CodeEditor.cpp CMakeLists.txt
+    ../include/SyntaxHighlighter.hpp ../include/ProjectTree.hpp ../include/KeywordDictionary.hpp ../include/FileType.hpp ../include/FileMenu.hpp ../include/CodeTabPane.hpp ../include/CodeEditor.hpp
 )
 target_include_directories(openide PRIVATE ${CMAKE_SOURCE_DIR}/include)
 target_link_libraries(openide PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)

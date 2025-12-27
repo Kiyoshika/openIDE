@@ -16,8 +16,9 @@ class MainWindow;
 
 namespace openide
 {
-class CodeEditor : QPlainTextEdit
+class CodeEditor : public QPlainTextEdit
 {
+    Q_OBJECT
 public:
     CodeEditor(MainWindow* parent = nullptr);
     void setComponentVisible(bool isVisible);
