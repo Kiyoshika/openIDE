@@ -14,6 +14,8 @@ Then start up QtCreator and build/run!
 ## Releases
 Check out the github releases for snapshot builds
 
+**WARNING**: The `main` branch may be unstable as it is the active development/experimental branch. Stick to releases for the "stable"-ish builds.
+
 ## Preview 
 Below is a preview of the `0.1.0` build on `2025 December 26`
 
