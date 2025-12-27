@@ -42,6 +42,16 @@ else()
             FileMenu.cpp
             ProjectTree.hpp
             ProjectTree.cpp
+            CodeEditor.hpp
+            CodeEditor.cpp
+            CodeTabPane.hpp
+            CodeEditor.cpp
+            KeywordDictionary.hpp
+            KeywordDictionary.cpp
+            FileType.hpp
+            FileType.cpp
+            SyntaxHighlighter.hpp
+            SyntaxHighlighter.cpp
         )
     endif()
 endif()

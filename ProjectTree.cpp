@@ -1,28 +1,85 @@
 #include "ProjectTree.hpp"
+#include "MainWindow.hpp"
+#include "FileType.hpp"
 
 using namespace openide;
 
-void projecttree::loadTreeFromDir(QWidget* parent, const QString* dirPath, QTreeView* projectTree)
+ProjectTree::ProjectTree(MainWindow* parent)
 {
-    if (!parent || !dirPath || !projectTree) return;
+    m_parent = parent;
+    m_fileSystemModel = new QFileSystemModel(parent->getCentralWidget());
+    m_fileSystemModel->setFilter(QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot);
+    m_treeView = new QTreeView(parent->getCentralWidget());
+    m_treeView->setModel(m_fileSystemModel);
 
-    QFileSystemModel* model = new QFileSystemModel(parent);
-    model->setRootPath(*dirPath);
-    model->setFilter(QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot);
+    // tree styling
+    m_treeView->setAnimated(true);
+    m_treeView->setSortingEnabled(true);
+    m_treeView->sortByColumn(0, Qt::AscendingOrder);
+    m_treeView->hideColumn(1); // Size
+    m_treeView->hideColumn(2); // Type
+    m_treeView->hideColumn(3); // Date Modified
+    m_treeView->setHeaderHidden(false);
+    m_treeView->setVisible(false);
+    m_treeView->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 
-    projectTree->setModel(model);
+    // grid placement
+    QGridLayout* layout = parent->getLayout();
+    layout->addWidget(m_treeView, 0, 0);
+    layout->setRowStretch(0, 1); // make row 0 stretchable
+    layout->setColumnStretch(0, 1); // column 0 ~20% of width
+    layout->setColumnStretch(1, 4); // column 1 ~80% of width
+}
+
+QTreeView* ProjectTree::getTreeView() const
+{
+    return m_treeView;
+}
+
+ProjectTree::~ProjectTree()
+{
+    // do NOT delete m_parent; this is a non-owning pointer
+    delete m_fileSystemModel;
+    delete m_treeView;
+}
+
+void ProjectTree::setComponentVisible(bool isVisible)
+{
+    this->m_treeView->setVisible(isVisible);
+}
+
+void ProjectTree::loadTreeFromDir(const QString* dirPath)
+{
+    if (!dirPath) return;
 
     // set root path pointed to by tree
-    QModelIndex rootIndex = model->index(*dirPath);
-    projectTree->setRootIndex(rootIndex);
+    m_fileSystemModel->setRootPath(*dirPath);
+    QModelIndex rootIndex = m_fileSystemModel->index(*dirPath);
+    m_treeView->setRootIndex(rootIndex);
 
-    // tree stylijng
-    projectTree->setAnimated(true);
-    projectTree->setSortingEnabled(true);
-    projectTree->sortByColumn(0, Qt::AscendingOrder);
-    projectTree->hideColumn(1); // Size
-    projectTree->hideColumn(2); // Type
-    projectTree->hideColumn(3); // Date Modified
+    this->m_parent->setComponentsVisible(true);
+}
 
-    projectTree->setHeaderHidden(false);
+void ProjectTree::onClick(CodeEditor& codeEditor, const QModelIndex& index)
+{
+    QFileSystemModel* model = qobject_cast<QFileSystemModel*>(this->m_treeView->model());
+    if (!model) return;
+
+    if (model->isDir(index))
+    {
+        return;
+    } else
+    {
+        const QString& path = model->filePath(index);
+        if (path.length() == 0) return;
+        enum FileType fileType = FileType::UNKNOWN;
+        // has file extension
+        int dotIndex = -1;
+        if ((dotIndex = path.lastIndexOf(".")) != -1 && dotIndex != path.length() - 1)
+        {
+            QString fileExtension = path.right(path.length() - (dotIndex + 1)).toLower();
+            fileType = FileTypeUtil::fromExtension(fileExtension);
+        }
+        codeEditor.loadFile(path, fileType);
+    }
 }

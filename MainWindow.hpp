@@ -2,6 +2,8 @@
 #define MAINWINDOW_HPP
 
 #include "FileMenu.hpp"
+#include "ProjectTree.hpp"
+#include "CodeEditor.hpp"
 
 #include <QMainWindow>
 #include <QMenu>
@@ -23,16 +25,20 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow(QWidget *parent = nullptr);
+    QWidget* getCentralWidget() const;
+    QGridLayout* getLayout() const;
     void initLayout();
     void initFileMenu(QMenuBar* menuBar);
     void initProjectTree();
+    void setComponentsVisible(bool isVisible);
     ~MainWindow();
 
 private:
     Ui::MainWindow *ui;
     QWidget* m_centralWidget;
     QGridLayout* m_layout;
-    QTreeView* m_projectTree;
+    openide::ProjectTree m_projectTree;
+    openide::CodeEditor m_codeEditor;
 };
 
 #endif // MAINWINDOW_HPP
