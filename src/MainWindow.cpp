@@ -1,12 +1,10 @@
 #include "MainWindow.hpp"
 #include "ProjectTree.hpp"
-#include "./ui_MainWindow.h"
 
 using namespace openide;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
     , m_centralWidget(new QWidget(this))
     // right now, hardlocking to grid layout - too much complexity
     // for what it's worth to make this super generic because then
@@ -16,7 +14,6 @@ MainWindow::MainWindow(QWidget *parent)
     , m_projectTree(this)
     , m_codeEditor(this)
 {
-    ui->setupUi(this);
     setCentralWidget(m_centralWidget);
 
     /* CALLBACKS/HANDLER INITIALIZATION */
@@ -46,8 +43,8 @@ void MainWindow::initFileMenu(QMenuBar* menuBar)
     fileMenu->addAction(newAction);
     fileMenu->addAction(openAction);
 
-    QString filePath;
-    QObject::connect(openAction, &QAction::triggered, this, [this, &filePath](){
+    QObject::connect(openAction, &QAction::triggered, this, [this](){
+        QString filePath;
         FileMenu::openDir(this, &filePath);
         if (!filePath.isEmpty())
             m_projectTree.loadTreeFromDir(&filePath);
@@ -62,7 +59,6 @@ void MainWindow::setComponentsVisible(bool isVisible)
 
 MainWindow::~MainWindow()
 {
-    delete ui;
     delete m_centralWidget;
     delete m_layout;
 }
