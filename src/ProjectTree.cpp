@@ -1,8 +1,10 @@
 #include "ProjectTree.hpp"
 #include "MainWindow.hpp"
 #include "FileType.hpp"
+#include "CodeTabPane.hpp"
 
 using namespace openide;
+using namespace openide::code;
 
 ProjectTree::ProjectTree(MainWindow* parent)
 {
@@ -24,11 +26,8 @@ ProjectTree::ProjectTree(MainWindow* parent)
     m_treeView->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 
     // grid placement
-    QGridLayout* layout = parent->getLayout();
-    layout->addWidget(m_treeView, 0, 0);
-    layout->setRowStretch(0, 1); // make row 0 stretchable
-    layout->setColumnStretch(0, 1); // column 0 ~20% of width
-    layout->setColumnStretch(1, 4); // column 1 ~80% of width
+    if (parent->getLayout())
+        parent->getLayout()->addWidget(m_treeView, 0, 0);
 }
 
 QTreeView* ProjectTree::getTreeView() const
@@ -60,7 +59,7 @@ void ProjectTree::loadTreeFromDir(const QString* dirPath)
     this->m_parent->setComponentsVisible(true);
 }
 
-void ProjectTree::onClick(CodeEditor& codeEditor, const QModelIndex& index)
+void ProjectTree::onClick(CodeTabPane& codeTabPane, const QModelIndex& index)
 {
     QFileSystemModel* model = qobject_cast<QFileSystemModel*>(this->m_treeView->model());
     if (!model) return;
@@ -73,6 +72,7 @@ void ProjectTree::onClick(CodeEditor& codeEditor, const QModelIndex& index)
         const QString& path = model->filePath(index);
         if (path.length() == 0) return;
         enum FileType fileType = FileType::UNKNOWN;
+
         // has file extension
         int dotIndex = -1;
         if ((dotIndex = path.lastIndexOf(".")) != -1 && dotIndex != path.length() - 1)
@@ -80,6 +80,17 @@ void ProjectTree::onClick(CodeEditor& codeEditor, const QModelIndex& index)
             QString fileExtension = path.right(path.length() - (dotIndex + 1)).toLower();
             fileType = FileTypeUtil::fromExtension(fileExtension);
         }
-        codeEditor.loadFile(path, fileType);
+
+        // grab file name
+        int slashIndex = -1;
+        QString fileName = "";
+        if (((slashIndex = path.lastIndexOf("/")) != -1) || ((slashIndex = path.lastIndexOf("\\")) != -1))
+            fileName = path.right(path.length() - (slashIndex + 1));
+        else
+            fileName = path;
+
+        CodeEditor* newEditor = new CodeEditor(m_parent);
+        newEditor->loadFile(path, fileType);
+        codeTabPane.addTab(newEditor, fileName);
     }
 }

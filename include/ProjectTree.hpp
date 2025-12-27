@@ -4,7 +4,7 @@
 // forward decl
 class MainWindow;
 
-#include "CodeEditor.hpp"
+#include "CodeTabPane.hpp"
 
 #include <QString>
 #include <QTreeView>
@@ -20,7 +20,7 @@ namespace openide
         QTreeView* getTreeView() const;
         void loadTreeFromDir(const QString* dirPath);
         void setComponentVisible(bool isVisible);
-        void onClick(CodeEditor& codeEditor, const QModelIndex& index);
+        void onClick(code::CodeTabPane& codeEditor, const QModelIndex& index);
         ~ProjectTree();
     private:
         MainWindow* m_parent;

@@ -4,6 +4,7 @@
 #include "FileMenu.hpp"
 #include "ProjectTree.hpp"
 #include "CodeEditor.hpp"
+#include "CodeTabPane.hpp"
 
 #include <QMainWindow>
 #include <QMenu>
@@ -38,7 +39,7 @@ private:
     QWidget* m_centralWidget;
     QGridLayout* m_layout;
     openide::ProjectTree m_projectTree;
-    openide::CodeEditor m_codeEditor;
+    openide::code::CodeTabPane m_codeTabPane;
 };
 
 #endif // MAINWINDOW_HPP
