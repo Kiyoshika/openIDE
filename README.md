@@ -6,9 +6,6 @@ This is not a glorious, production-grade IDE, I simply wrote this because I was 
 ## Building
 This is a Qt6 cmake project, so install the following (below is for linux, your OS may differ):
 ```
-```
-````
-```
 sudo apt-get install cmake qtcreator build-essential libgl1-mesa-dev qt6-base-dev qt6-tools-dev-tools
 ```
 
@@ -18,4 +15,6 @@ Then start up QtCreator and build/run!
 Check out the github releases for snapshot builds
 
 ## Preview 
-Below is a preview of the 0.1.0 build on `2025 December 26`
+Below is a preview of the `0.1.0` build on `2025 December 26`
+
+<img width="812" height="632" alt="image" src="https://github.com/user-attachments/assets/8a88f855-b5f5-4a40-941d-53da80290aaf" />
