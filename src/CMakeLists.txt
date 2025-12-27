@@ -23,6 +23,7 @@ set(PROJECT_SOURCES
 qt_add_executable(${CMAKE_PROJECT_NAME} ${PROJECT_SOURCES})
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE openide Qt${QT_VERSION_MAJOR}::Widgets)
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/include)
+qt_finalize_executable(openIDE)
 #target_compile_options(openIDE PRIVATE -fsanitize=address -fno-omit-frame-pointer)
 #target_link_options(openIDE PRIVATE -fsanitize=address)
 
@@ -41,6 +42,3 @@ install(TARGETS openIDE
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
-if(QT_VERSION_MAJOR EQUAL 6)
-    #qt_finalize_executable(openIDE)
-endif()
