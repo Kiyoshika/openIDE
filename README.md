@@ -25,9 +25,9 @@ Check out the github [releases](https://github.com/Kiyoshika/openIDE/tags) for s
 **WARNING**: The `main` branch may be unstable as it is the active development/experimental branch. Stick to releases for the "stable"-ish builds.
 
 ## Preview 
-Below is a preview of the `0.1.0` build on `2025 December 26`
+Below is a preview of the `0.2.0` build on `2025 December 27`
 
-<img width="812" height="632" alt="image" src="https://github.com/user-attachments/assets/8a88f855-b5f5-4a40-941d-53da80290aaf" />
+<img width="1195" height="830" alt="image" src="https://github.com/user-attachments/assets/0a29015b-b787-43b3-9ed1-da9e956f1615" />
 
 ## Wishlist
 These are the features that I eventually want to implement (in no particular order)
