@@ -8,6 +8,8 @@
 #include <QMenu>
 #include <QMenuBar>
 
+#include <functional>
+
 // forward decl
 class MainWindow;
 
@@ -17,7 +19,12 @@ class FileMenu : public QMenu
 {
     Q_OBJECT
 public:
-    FileMenu(MainWindow* parent, QMenuBar* menuBar, ProjectTree* projectTree);
+    FileMenu(
+        MainWindow* parent,
+        QMenuBar* menuBar,
+        ProjectTree* projectTree,
+        std::function<void()> saveFileCallback,
+        std::function<void()> saveAllFilesCallback);
     ~FileMenu() = default;
 
     /**
@@ -35,6 +42,8 @@ public:
     void openDir(QWidget* parent, QString* dirPath);
 private:
     openide::ProjectTree* m_projectTree;
+    std::function<void()> m_saveFileCallback;
+    std::function<void()> m_saveAllFilesCallback;
 };
 }
 

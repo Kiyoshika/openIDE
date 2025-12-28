@@ -29,8 +29,10 @@ public:
     void loadFile(const QString& path, enum FileType fileType);
     void saveFile() const;
     void setModified(bool isModified);
+    bool isModified() const;
     ~CodeEditor() = default;
 private:
+    bool m_isModified;
     QString m_filePath;
     openide::SyntaxHighlighter m_syntaxHighlighter;
     std::function<void()> m_dirtyTabCallback;

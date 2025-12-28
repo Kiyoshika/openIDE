@@ -14,7 +14,11 @@ MainWindow::MainWindow(QWidget *parent)
     , m_layout(new QGridLayout(m_centralWidget))
     , m_projectTree(this)
     , m_codeTabPane(this)
-    , m_fileMenu(this, this->menuBar(), &m_projectTree)
+    , m_fileMenu(this, this->menuBar(), &m_projectTree,
+        // saveFileCallback
+        [this](){m_codeTabPane.saveActiveFile();},
+         // saveAllFilesCallback
+        [this](){m_codeTabPane.saveAllActiveFiles();})
 {
     QMainWindow::resize(1200, 800);
     setCentralWidget(m_centralWidget);

@@ -26,7 +26,6 @@ These are the features that I eventually want to implement (in no particular ord
 * Vim motions
 * Tree sitter for actual proper syntax highlighting (currently using regex as a placeholder)
 * Creating new projects
-* Saving files
 * Adding build/run configurations (and saving/exporting them)
 * Find/replace
 * Highlight-tabbing (select a portion of text and press tab - should tab everything)
