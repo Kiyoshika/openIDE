@@ -28,9 +28,6 @@ public:
     MainWindow(QWidget *parent = nullptr);
     QWidget* getCentralWidget() const;
     QGridLayout* getLayout() const;
-    void initLayout();
-    void initFileMenu(QMenuBar* menuBar);
-    void initProjectTree();
     void setComponentsVisible(bool isVisible);
     ~MainWindow();
 
@@ -40,6 +37,7 @@ private:
     QGridLayout* m_layout;
     openide::ProjectTree m_projectTree;
     openide::code::CodeTabPane m_codeTabPane;
+    openide::menu::FileMenu m_fileMenu;
 };
 
 #endif // MAINWINDOW_HPP
