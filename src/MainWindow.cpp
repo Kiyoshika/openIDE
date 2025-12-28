@@ -1,6 +1,6 @@
 #include "MainWindow.hpp"
 #include "ProjectTree.hpp"
-#include "CodeTabPane.hpp"
+#include "code/CodeTabPane.hpp"
 
 using namespace openide;
 

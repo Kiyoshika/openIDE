@@ -13,8 +13,11 @@ class MainWindow;
 #include <QFile>
 #include <QTextStream>
 #include <QSyntaxHighlighter>
+#include <QTabWidget>
 
-namespace openide
+#include <functional>
+
+namespace openide::code
 {
 class CodeEditor : public QPlainTextEdit
 {
@@ -22,10 +25,15 @@ class CodeEditor : public QPlainTextEdit
 public:
     CodeEditor(MainWindow* parent = nullptr);
     void setComponentVisible(bool isVisible);
+    void attachDirtyTabCallback(std::function<void()> callback);
     void loadFile(const QString& path, enum FileType fileType);
-    ~CodeEditor();
+    void saveFile() const;
+    void setModified(bool isModified);
+    ~CodeEditor() = default;
 private:
+    QString m_filePath;
     openide::SyntaxHighlighter m_syntaxHighlighter;
+    std::function<void()> m_dirtyTabCallback;
 };
 }
 #endif // CODEEDITOR_HPP

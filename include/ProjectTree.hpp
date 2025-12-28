@@ -4,7 +4,7 @@
 // forward decl
 class MainWindow;
 
-#include "CodeTabPane.hpp"
+#include "code/CodeTabPane.hpp"
 
 #include <QString>
 #include <QTreeView>

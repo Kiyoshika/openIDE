@@ -21,7 +21,7 @@ Below is a preview of the `0.1.0` build on `2025 December 26`
 
 ## Wishlist
 These are the features that I eventually want to implement (in no particular order)
-* Code tabs (basically the necessary feature of any ide)
+* Right-click context menus
 * Line numbers
 * Vim motions
 * Tree sitter for actual proper syntax highlighting (currently using regex as a placeholder)
