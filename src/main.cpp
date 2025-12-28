@@ -11,6 +11,9 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    // temp style until we do "real" styling at some point
+    a.setStyle("Fusion");
+
     QIcon folderIcon =
         QIcon::fromTheme("folder", QIcon(":/icons/folder.png"));
 
