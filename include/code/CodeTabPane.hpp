@@ -17,6 +17,7 @@ public:
   void setComponentVisible(bool isVisible);
   void saveActiveFile();
   void saveAllActiveFiles();
+  bool fileIsOpen(const QString& path) const;
   ~CodeTabPane() = default;
 
 private:

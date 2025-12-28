@@ -86,7 +86,11 @@ void ProjectTree::onClick(CodeTabPane& codeTabPane, const QModelIndex& index)
     else
         fileName = path;
 
-    CodeEditor* newEditor = new CodeEditor(m_parent);
-    newEditor->loadFile(path, fileType);
-    codeTabPane.addTab(newEditor, fileName);
+    if (!codeTabPane.fileIsOpen(path))
+    {
+
+        CodeEditor* newEditor = new CodeEditor(m_parent);
+        newEditor->loadFile(path, fileType);
+        codeTabPane.addTab(newEditor, fileName);
+    }
 }

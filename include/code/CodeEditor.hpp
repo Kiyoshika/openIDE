@@ -26,6 +26,7 @@ public:
     CodeEditor(MainWindow* parent = nullptr);
     void setComponentVisible(bool isVisible);
     void attachDirtyTabCallback(std::function<void()> callback);
+    const QString& getFilePath() const;
     void loadFile(const QString& path, enum FileType fileType);
     void saveFile() const;
     void setModified(bool isModified);

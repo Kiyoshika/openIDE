@@ -1,4 +1,4 @@
-#include "SyntaxHighlighter.hpp"
+#include "code/SyntaxHighlighter.hpp"
 
 using namespace openide;
 

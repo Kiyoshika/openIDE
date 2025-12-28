@@ -90,3 +90,8 @@ void CodeEditor::saveFile() const
     out.setEncoding(QStringConverter::Utf8);
     out << fileContent;
 }
+
+const QString& CodeEditor::getFilePath() const
+{
+    return m_filePath;
+}

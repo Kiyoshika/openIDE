@@ -108,3 +108,14 @@ void CodeTabPane::undirtyTabByIndex_(int index)
     if (tabName.endsWith(" *"))
         QTabWidget::setTabText(index, tabName.left(tabName.length() - 2));
 }
+
+bool CodeTabPane::fileIsOpen(const QString& path) const
+{
+    for (int i = 0; i < QTabWidget::count(); ++i)
+    {
+        CodeEditor* editor = qobject_cast<CodeEditor*>(QTabWidget::widget(i));
+        if (editor->getFilePath() == path) return true;
+    }
+
+    return false;
+}
