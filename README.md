@@ -32,6 +32,9 @@ Below is a preview of the `0.1.0` build on `2025 December 26`
 ## Wishlist
 These are the features that I eventually want to implement (in no particular order)
 * Right-click context menus
+    * ProjectTree - new/rename/delete files/directories, collapse/collapse all, etc.
+    * CodeTabPane - close all/close all others, split vertical/horizontal
+    * CodeEditor - view definitions/implementation, refactor, etc.
 * Line numbers
 * Vim motions
 * Tree sitter for actual proper syntax highlighting (currently using regex as a placeholder)
@@ -42,8 +45,14 @@ These are the features that I eventually want to implement (in no particular ord
 * Smart indenting (e.g., pressing enter and having the next line tab up correctly)
 * Proper keyword dictionaries for common languages (what I have now is just a placeholder to see some highlighting)
 * Support for custom themes (+ importing/exporting themes)
-* Settings menu for various things (tab spaces, font size, etc.)
+* Settings menu for various things (tab spaces, font size, default theme, etc.)
 * Adjust font size with Ctrl+Scroll
+* Adjust scale of UI somehow (configurable in settings)
+* Split code views vertically/horizontally
+* File diffing
+* Git integration
+* Code traversal (goto definition/implementation, etc.)
+* Overhaul of the styling to make it actually look bearable on the eyes
 
 ## License
 This Qt project is licensed under LPGLv3
