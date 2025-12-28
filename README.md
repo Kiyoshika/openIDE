@@ -53,6 +53,7 @@ These are the features that I eventually want to implement (in no particular ord
 * Git integration
 * Code traversal (goto definition/implementation, etc.)
 * Overhaul of the styling to make it actually look bearable on the eyes
+* Integrated terminal
 
 ## License
 This Qt project is licensed under LPGLv3
