@@ -1,7 +1,7 @@
-#include "CodeEditor.hpp"
+#include "code/CodeEditor.hpp"
 #include "MainWindow.hpp"
 
-using namespace openide;
+using namespace openide::code;
 
 CodeEditor::CodeEditor(MainWindow* parent) : QPlainTextEdit(parent ? parent->getCentralWidget() : parent), m_syntaxHighlighter{this->document()}
 {
@@ -26,11 +26,29 @@ CodeEditor::CodeEditor(MainWindow* parent) : QPlainTextEdit(parent ? parent->get
     QGridLayout* layout = parent->getLayout();
     layout->addWidget(this, 0, 1);
     this->setVisible(false);
+
+    // default callback (no-op) to prevent crashes
+    m_dirtyTabCallback = []{};
+
+    // handler for dirty state (modified since last save)
+    connect(this->document(), &QTextDocument::modificationChanged, this, [this](bool modified){
+        if (modified) m_dirtyTabCallback();
+    });
+}
+
+void CodeEditor::setModified(bool isModified)
+{
+    QPlainTextEdit::document()->setModified(isModified);
 }
 
 void CodeEditor::setComponentVisible(bool isVisible)
 {
     this->setVisible(isVisible);
+}
+
+void CodeEditor::attachDirtyTabCallback(std::function<void()> callback)
+{
+    m_dirtyTabCallback = std::move(callback);
 }
 
 void CodeEditor::loadFile(const QString& path, enum FileType fileType)
@@ -47,6 +65,18 @@ void CodeEditor::loadFile(const QString& path, enum FileType fileType)
     m_syntaxHighlighter.setKeywords(keywords);
     this->setPlainText(fileContent);
     m_syntaxHighlighter.rehighlight();
+
+    m_filePath = path;
 }
 
-CodeEditor::~CodeEditor() {}
+void CodeEditor::saveFile() const
+{
+    if (m_filePath.isEmpty()) return;
+    QString fileContent = QPlainTextEdit::document()->toPlainText();
+    QFile file(m_filePath);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) return;
+
+    QTextStream out(&file);
+    out.setEncoding(QStringConverter::Utf8);
+    out << fileContent;
+}

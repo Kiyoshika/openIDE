@@ -1,10 +1,10 @@
 #ifndef MAINWINDOW_HPP
 #define MAINWINDOW_HPP
 
-#include "FileMenu.hpp"
+#include "menu/FileMenu.hpp"
 #include "ProjectTree.hpp"
-#include "CodeEditor.hpp"
-#include "CodeTabPane.hpp"
+#include "code/CodeEditor.hpp"
+#include "code/CodeTabPane.hpp"
 
 #include <QMainWindow>
 #include <QMenu>

@@ -1,4 +1,4 @@
-#include "FileMenu.hpp"
+#include "menu/FileMenu.hpp"
 #include "ProjectTree.hpp"
 
 using namespace openide;

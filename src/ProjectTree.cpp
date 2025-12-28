@@ -1,7 +1,7 @@
 #include "ProjectTree.hpp"
 #include "MainWindow.hpp"
 #include "FileType.hpp"
-#include "CodeTabPane.hpp"
+#include "code/CodeTabPane.hpp"
 
 using namespace openide;
 using namespace openide::code;
@@ -64,33 +64,29 @@ void ProjectTree::onClick(CodeTabPane& codeTabPane, const QModelIndex& index)
     QFileSystemModel* model = qobject_cast<QFileSystemModel*>(this->m_treeView->model());
     if (!model) return;
 
-    if (model->isDir(index))
+    if (model->isDir(index)) return;
+
+    const QString& path = model->filePath(index);
+    if (path.length() == 0) return;
+    enum FileType fileType = FileType::UNKNOWN;
+
+    // has file extension
+    int dotIndex = -1;
+    if ((dotIndex = path.lastIndexOf(".")) != -1 && dotIndex != path.length() - 1)
     {
-        return;
-    } else
-    {
-        const QString& path = model->filePath(index);
-        if (path.length() == 0) return;
-        enum FileType fileType = FileType::UNKNOWN;
-
-        // has file extension
-        int dotIndex = -1;
-        if ((dotIndex = path.lastIndexOf(".")) != -1 && dotIndex != path.length() - 1)
-        {
-            QString fileExtension = path.right(path.length() - (dotIndex + 1)).toLower();
-            fileType = FileTypeUtil::fromExtension(fileExtension);
-        }
-
-        // grab file name
-        int slashIndex = -1;
-        QString fileName = "";
-        if (((slashIndex = path.lastIndexOf("/")) != -1) || ((slashIndex = path.lastIndexOf("\\")) != -1))
-            fileName = path.right(path.length() - (slashIndex + 1));
-        else
-            fileName = path;
-
-        CodeEditor* newEditor = new CodeEditor(m_parent);
-        newEditor->loadFile(path, fileType);
-        codeTabPane.addTab(newEditor, fileName);
+        QString fileExtension = path.right(path.length() - (dotIndex + 1)).toLower();
+        fileType = FileTypeUtil::fromExtension(fileExtension);
     }
+
+    // grab file name
+    int slashIndex = -1;
+    QString fileName = "";
+    if (((slashIndex = path.lastIndexOf("/")) != -1) || ((slashIndex = path.lastIndexOf("\\")) != -1))
+        fileName = path.right(path.length() - (slashIndex + 1));
+    else
+        fileName = path;
+
+    CodeEditor* newEditor = new CodeEditor(m_parent);
+    newEditor->loadFile(path, fileType);
+    codeTabPane.addTab(newEditor, fileName);
 }
