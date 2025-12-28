@@ -41,15 +41,7 @@ CodeTabPane::CodeTabPane(MainWindow *parent)
         CodeEditor* activeEditor = qobject_cast<CodeEditor*>(QTabWidget::currentWidget());
         if (!activeEditor) return;
         activeEditor->saveFile();
-
-        // find the focused editor and call the save method
-        // then rename tab
-        int index = QTabWidget::currentIndex();
-        const QString& tabName = QTabWidget::tabText(index);
-        if (tabName.endsWith(" *")) // dirtied tab format
-            QTabWidget::setTabText(index, tabName.left(tabName.length() - 2));
-
-        // reset modified state in editor
+        undirtyTabByIndex_(QTabWidget::currentIndex());
         activeEditor->setModified(false);
     });
 }
@@ -58,12 +50,11 @@ void CodeTabPane::addTab(CodeEditor* editor, const QString& tabName)
 {
     if (!editor) return;
     // attach the dirtyTabCallback to the editor to mark when the file
-    // is edited, to update the tab text
+    // is edited to update the tab text
     editor->attachDirtyTabCallback([this](){
         int index = QTabWidget::currentIndex();
-        const QString& tabName = QTabWidget::tabText(index);
-        if (!tabName.endsWith(" *"))
-            QTabWidget::setTabText(index, tabName + " *");
+        dirtyTabByIndex_(index);
+
     });
     QTabWidget::addTab(editor, tabName);
     setCurrentWidget(editor);
@@ -72,4 +63,48 @@ void CodeTabPane::addTab(CodeEditor* editor, const QString& tabName)
 void CodeTabPane::setComponentVisible(bool isVisible)
 {
     QTabWidget::setVisible(isVisible);
+}
+
+void CodeTabPane::saveActiveFile()
+{
+    saveFileByIndex_(QTabWidget::currentIndex());
+}
+
+void CodeTabPane::saveAllActiveFiles()
+{
+    for (int i = 0; i < QTabWidget::count(); ++i)
+        saveFileByIndex_(i);
+}
+
+void CodeTabPane::saveFileByIndex_(int index)
+{
+    if (index < 0 || index >= QTabWidget::count()) return;
+
+    CodeEditor* editor = qobject_cast<CodeEditor*>(QTabWidget::widget(index));
+    if (!editor) return;
+
+    if (editor->isModified())
+    {
+        editor->saveFile();
+        undirtyTabByIndex_(index);
+        editor->setModified(false);
+    }
+}
+
+void CodeTabPane::dirtyTabByIndex_(int index)
+{
+    if (index < 0 || index >= QTabWidget::count()) return;
+
+    const QString& tabName = QTabWidget::tabText(index);
+    if (!tabName.endsWith(" *"))
+        QTabWidget::setTabText(index, tabName + " *");
+}
+
+void CodeTabPane::undirtyTabByIndex_(int index)
+{
+    if (index < 0 || index >= QTabWidget::count()) return;
+
+    const QString& tabName = QTabWidget::tabText(index);
+    if (tabName.endsWith(" *"))
+        QTabWidget::setTabText(index, tabName.left(tabName.length() - 2));
 }

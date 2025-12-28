@@ -3,7 +3,10 @@
 
 using namespace openide::code;
 
-CodeEditor::CodeEditor(MainWindow* parent) : QPlainTextEdit(parent ? parent->getCentralWidget() : parent), m_syntaxHighlighter{this->document()}
+CodeEditor::CodeEditor(MainWindow* parent)
+    : QPlainTextEdit(parent ? parent->getCentralWidget() : parent)
+    , m_syntaxHighlighter{this->document()}
+    , m_isModified{false}
 {
     if (!parent) return;
 
@@ -32,6 +35,7 @@ CodeEditor::CodeEditor(MainWindow* parent) : QPlainTextEdit(parent ? parent->get
 
     // handler for dirty state (modified since last save)
     connect(this->document(), &QTextDocument::modificationChanged, this, [this](bool modified){
+        m_isModified = modified;
         if (modified) m_dirtyTabCallback();
     });
 }
@@ -39,6 +43,12 @@ CodeEditor::CodeEditor(MainWindow* parent) : QPlainTextEdit(parent ? parent->get
 void CodeEditor::setModified(bool isModified)
 {
     QPlainTextEdit::document()->setModified(isModified);
+    m_isModified = isModified;
+}
+
+bool CodeEditor::isModified() const
+{
+    return m_isModified;
 }
 
 void CodeEditor::setComponentVisible(bool isVisible)

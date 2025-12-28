@@ -15,11 +15,6 @@ int main(int argc, char *argv[])
         QIcon::fromTheme("folder", QIcon(":/icons/folder.png"));
 
     MainWindow w;
-
-    // setup menu bar
-    QMenuBar* menuBar = w.menuBar();
-    w.initFileMenu(menuBar);
-
     w.show();
     return a.exec();
 }

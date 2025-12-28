@@ -14,6 +14,11 @@ MainWindow::MainWindow(QWidget *parent)
     , m_layout(new QGridLayout(m_centralWidget))
     , m_projectTree(this)
     , m_codeTabPane(this)
+    , m_fileMenu(this, this->menuBar(), &m_projectTree,
+        // saveFileCallback
+        [this](){m_codeTabPane.saveActiveFile();},
+         // saveAllFilesCallback
+        [this](){m_codeTabPane.saveAllActiveFiles();})
 {
     QMainWindow::resize(1200, 800);
     setCentralWidget(m_centralWidget);
@@ -26,6 +31,7 @@ MainWindow::MainWindow(QWidget *parent)
     /* CALLBACKS/HANDLER INITIALIZATION */
 
     // double clicking file on project tree populates code editor
+    // TODO: move this to the actual ProjectTree class ctor isntead of main window
     QObject::connect(m_projectTree.getTreeView(), &QTreeView::doubleClicked, this, [this](const QModelIndex& index){
         m_projectTree.onClick(m_codeTabPane, index);
     });
@@ -39,23 +45,6 @@ QWidget* MainWindow::getCentralWidget() const
 QGridLayout* MainWindow::getLayout() const
 {
     return m_layout;
-}
-
-void MainWindow::initFileMenu(QMenuBar* menuBar)
-{
-    QMenu* fileMenu = menuBar->addMenu("&File");
-    QAction* newAction = new QAction("&New Project", this);
-    QAction* openAction = new QAction("&Open Project", this);
-
-    fileMenu->addAction(newAction);
-    fileMenu->addAction(openAction);
-
-    QObject::connect(openAction, &QAction::triggered, this, [this](){
-        QString filePath;
-        FileMenu::openDir(this, &filePath);
-        if (!filePath.isEmpty())
-            m_projectTree.loadTreeFromDir(&filePath);
-    });
 }
 
 void MainWindow::setComponentsVisible(bool isVisible)
