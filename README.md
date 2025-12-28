@@ -9,10 +9,18 @@ This is a Qt6 cmake project, so install the following (below is for linux, your 
 sudo apt-get install cmake qtcreator build-essential libgl1-mesa-dev qt6-base-dev qt6-tools-dev-tools
 ```
 
-Then start up QtCreator and build/run!
+### Building with QtCreator
+If building with QtCreator, just `File > Open File or Project` and select the root `CMakeLists.txt`. Everything should configure automaticaly after importing. 
+
+### Building with CMake Directly
+If you want to build manually with CMake, it's fairly straightforward. Ensure you have the above Qt6 dependencies installed, then:
+1. From project root: `mkdir build && cd build`
+2. `cmake ..`
+3. `make`
+4. Start the app: `./build/src/openIDE`
 
 ## Releases
-Check out the github releases for snapshot builds
+Check out the github [releases](https://github.com/Kiyoshika/openIDE/tags) for snapshot builds
 
 ## Preview 
 Below is a preview of the `0.1.0` build on `2025 December 26`
