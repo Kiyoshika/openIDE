@@ -17,6 +17,9 @@
 #include <QObject>
 #include <QTreeView>
 #include <QLayout>
+#include <QSplitter>
+#include <QToolBar>
+#include <QPushButton>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -32,6 +35,7 @@ public:
     MainWindow(QWidget *parent = nullptr);
     QWidget* getCentralWidget() const;
     QGridLayout* getLayout() const;
+    QSplitter* getSplitter() const { return m_splitter; }
     void setComponentsVisible(bool isVisible);
     openide::AppSettings* getAppSettings() { return &m_appSettings; }
     openide::code::CodeTabPane* getCodeTabPane() { return &m_codeTabPane; }
@@ -41,11 +45,15 @@ public:
 
 private slots:
     void onProjectOpened(const QString& projectPath, const QString& projectName);
+    void toggleProjectTree();
 
 private:
     Ui::MainWindow *ui;
     QWidget* m_centralWidget;
     QGridLayout* m_layout;
+    QSplitter* m_splitter;
+    QToolBar* m_toolBar;
+    QAction* m_toggleTreeAction;
     openide::ProjectTree m_projectTree;
     openide::code::CodeTabPane m_codeTabPane;
     openide::menu::FileMenu m_fileMenu;

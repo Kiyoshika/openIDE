@@ -16,10 +16,6 @@ CodeTabPane::CodeTabPane(MainWindow *parent)
     QTabWidget::setDocumentMode(true);
     QTabWidget::setElideMode(Qt::ElideRight);
 
-    // grid placement
-    if (parent->getLayout())
-        parent->getLayout()->addWidget(this, 0, 1);
-
     // handler to close the tab
     QTabWidget::connect(this, &QTabWidget::tabCloseRequested, parent, [this](int index){
         QWidget* page = QTabWidget::widget(index);

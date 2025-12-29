@@ -47,10 +47,7 @@ These are the features that I eventually want to implement (in no particular ord
     * CodeEditor - view definitions/implementation, refactor, etc.
 * Vim motions
 * Adding build/run configurations (and saving/exporting them)
-* Highlight-tabbing (select a portion of text and press tab - should tab everything)
-* Smart indenting (e.g., pressing enter and having the next line tab up correctly)
 * Support for custom themes (+ importing/exporting themes)
-* Adjust font size with Ctrl+Scroll
 * Adjust scale of UI somehow (configurable in settings)
 * Split code views vertically/horizontally
 * File diffing

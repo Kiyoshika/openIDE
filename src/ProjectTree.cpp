@@ -27,10 +27,6 @@ ProjectTree::ProjectTree(MainWindow* parent)
     setVisible(false);
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
     
-    // grid placement
-    if (parent && parent->getLayout())
-        parent->getLayout()->addWidget(this, 0, 0);
-    
     // Connect double-click to our handler
     connect(this, &QTreeView::doubleClicked, this, &ProjectTree::onItemDoubleClicked);
 }
