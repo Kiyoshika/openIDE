@@ -2,50 +2,43 @@
 #include "MainWindow.hpp"
 #include "FileType.hpp"
 #include "code/CodeTabPane.hpp"
+#include "code/CodeEditor.hpp"
 #include "AppSettings.hpp"
 
 using namespace openide;
 using namespace openide::code;
 
 ProjectTree::ProjectTree(MainWindow* parent)
+    : QTreeView(parent)
+    , m_parent(parent)
+    , m_fileSystemModel(new QFileSystemModel(this))
 {
-    m_parent = parent;
-    m_fileSystemModel = new QFileSystemModel(parent->getCentralWidget());
     m_fileSystemModel->setFilter(QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot);
-    m_treeView = new QTreeView(parent->getCentralWidget());
-    m_treeView->setModel(m_fileSystemModel);
+    setModel(m_fileSystemModel);
 
     // tree styling
-    m_treeView->setAnimated(true);
-    m_treeView->setSortingEnabled(true);
-    m_treeView->sortByColumn(0, Qt::AscendingOrder);
-    m_treeView->hideColumn(1); // Size
-    m_treeView->hideColumn(2); // Type
-    m_treeView->hideColumn(3); // Date Modified
-    m_treeView->setHeaderHidden(false);
-    m_treeView->setVisible(false);
-    m_treeView->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+    setAnimated(true);
+    setSortingEnabled(true);
+    sortByColumn(0, Qt::AscendingOrder);
+    hideColumn(1); // Size
+    hideColumn(2); // Type
+    hideColumn(3); // Date Modified
+    setHeaderHidden(false);
+    setVisible(false);
+    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 
     // grid placement
-    if (parent->getLayout())
-        parent->getLayout()->addWidget(m_treeView, 0, 0);
-}
-
-QTreeView* ProjectTree::getTreeView() const
-{
-    return m_treeView;
+    if (parent && parent->getLayout())
+        parent->getLayout()->addWidget(this, 0, 0);
+    
+    // Connect double-click to our handler
+    connect(this, &QTreeView::doubleClicked, this, &ProjectTree::onItemDoubleClicked);
 }
 
 ProjectTree::~ProjectTree()
 {
-    // do NOT delete m_parent; this is a non-owning pointer
-    delete m_fileSystemModel;
-    delete m_treeView;
-}
-
-void ProjectTree::setComponentVisible(bool isVisible)
-{
-    this->m_treeView->setVisible(isVisible);
+    // QTreeView destructor will handle cleanup
+    // m_fileSystemModel will be deleted by Qt's parent-child ownership (this is its parent)
 }
 
 void ProjectTree::loadTreeFromDir(const QString* dirPath)
@@ -55,25 +48,30 @@ void ProjectTree::loadTreeFromDir(const QString* dirPath)
     // set root path pointed to by tree
     m_fileSystemModel->setRootPath(*dirPath);
     QModelIndex rootIndex = m_fileSystemModel->index(*dirPath);
-    m_treeView->setRootIndex(rootIndex);
+    setRootIndex(rootIndex);
 
-    this->m_parent->setComponentsVisible(true);
+    if (m_parent)
+        m_parent->setComponentsVisible(true);
 }
 
-void ProjectTree::onClick(CodeTabPane& codeTabPane, const QModelIndex& index, openide::AppSettings* settings)
+void ProjectTree::onItemDoubleClicked(const QModelIndex& index)
 {
-    QFileSystemModel* model = qobject_cast<QFileSystemModel*>(this->m_treeView->model());
+    if (!m_parent) return;
+    
+    QFileSystemModel* model = qobject_cast<QFileSystemModel*>(this->model());
     if (!model) return;
 
+    // Ignore directories
     if (model->isDir(index)) return;
 
     const QString& path = model->filePath(index);
-    if (path.length() == 0) return;
-    enum FileType fileType = FileType::UNKNOWN;
+    if (path.isEmpty()) return;
+    
+    FileType fileType = FileType::UNKNOWN;
 
     // has file extension
-    int dotIndex = -1;
-    if ((dotIndex = path.lastIndexOf(".")) != -1 && dotIndex != path.length() - 1)
+    int dotIndex = path.lastIndexOf(".");
+    if (dotIndex != -1 && dotIndex != path.length() - 1)
     {
         QString fileExtension = path.right(path.length() - (dotIndex + 1)).toLower();
         fileType = FileTypeUtil::fromExtension(fileExtension);
@@ -81,17 +79,17 @@ void ProjectTree::onClick(CodeTabPane& codeTabPane, const QModelIndex& index, op
 
     // grab file name
     int slashIndex = -1;
-    QString fileName = "";
+    QString fileName;
     if (((slashIndex = path.lastIndexOf("/")) != -1) || ((slashIndex = path.lastIndexOf("\\")) != -1))
         fileName = path.right(path.length() - (slashIndex + 1));
     else
         fileName = path;
 
-    if (!codeTabPane.fileIsOpen(path))
-    {
-
-        CodeEditor* newEditor = new CodeEditor(m_parent, settings);
+    // Open file in CodeTabPane
+    code::CodeTabPane* codeTabPane = m_parent->getCodeTabPane();
+    if (codeTabPane && !codeTabPane->fileIsOpen(path)) {
+        code::CodeEditor* newEditor = new code::CodeEditor(m_parent, m_parent->getAppSettings());
         newEditor->loadFile(path, fileType);
-        codeTabPane.addTab(newEditor, fileName);
+        codeTabPane->addTab(newEditor, fileName);
     }
 }

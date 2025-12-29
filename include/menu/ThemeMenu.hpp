@@ -10,24 +10,24 @@ class MainWindow;
 
 namespace openide::menu
 {
-enum class Theme {
-    System,
-    Light,
-    Dark
-};
-
 class ThemeMenu : public QMenu
 {
     Q_OBJECT
 public:
+    enum class Theme {
+        System,
+        Light,
+        Dark
+    };
+    Q_ENUM(Theme)
     ThemeMenu(MainWindow* parent, QMenuBar* menuBar);
     ~ThemeMenu() = default;
     
-    void applyTheme(Theme theme);
-    Theme getCurrentTheme() const { return m_currentTheme; }
+    void applyTheme(ThemeMenu::Theme theme);
+    ThemeMenu::Theme getCurrentTheme() const { return m_currentTheme; }
     
 signals:
-    void themeChanged(Theme theme);
+    void themeChanged(ThemeMenu::Theme theme);
     
 private slots:
     void onLightThemeTriggered();
@@ -36,7 +36,7 @@ private slots:
     
 private:
     void detectSystemTheme();
-    Theme m_currentTheme;
+    ThemeMenu::Theme m_currentTheme;
     QAction* m_lightThemeAction;
     QAction* m_darkThemeAction;
     QAction* m_systemThemeAction;

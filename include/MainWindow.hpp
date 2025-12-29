@@ -34,7 +34,12 @@ public:
     void setComponentsVisible(bool isVisible);
     openide::AppSettings* getAppSettings() { return &m_appSettings; }
     openide::code::CodeTabPane* getCodeTabPane() { return &m_codeTabPane; }
+    void setProjectTitle(const QString& projectName);
+    QString getCurrentProjectRoot() const { return m_currentProjectRoot; }
     ~MainWindow();
+
+private slots:
+    void onProjectOpened(const QString& projectPath, const QString& projectName);
 
 private:
     Ui::MainWindow *ui;
@@ -46,6 +51,8 @@ private:
     openide::menu::ThemeMenu m_themeMenu;
     openide::menu::SettingsMenu m_settingsMenu;
     openide::AppSettings m_appSettings;
+    QString m_currentProjectName;
+    QString m_currentProjectRoot;
 };
 
 #endif // MAINWINDOW_HPP

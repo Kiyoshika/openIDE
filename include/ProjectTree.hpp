@@ -6,6 +6,7 @@ class MainWindow;
 namespace openide { class AppSettings; }
 
 #include "code/CodeTabPane.hpp"
+#include "FileType.hpp"
 
 #include <QString>
 #include <QTreeView>
@@ -14,19 +15,20 @@ namespace openide { class AppSettings; }
 
 namespace openide
 {
-    class ProjectTree
+    class ProjectTree : public QTreeView
     {
+        Q_OBJECT
     public:
         ProjectTree(MainWindow* parent);
-        QTreeView* getTreeView() const;
         void loadTreeFromDir(const QString* dirPath);
-        void setComponentVisible(bool isVisible);
-        void onClick(code::CodeTabPane& codeEditor, const QModelIndex& index, openide::AppSettings* settings = nullptr);
         ~ProjectTree();
+        
+    private slots:
+        void onItemDoubleClicked(const QModelIndex& index);
+        
     private:
         MainWindow* m_parent;
         QFileSystemModel* m_fileSystemModel;
-        QTreeView* m_treeView;
     };
 }
 #endif // PROJECTTREE_HPP

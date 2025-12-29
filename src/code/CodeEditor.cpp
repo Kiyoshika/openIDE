@@ -39,17 +39,18 @@ CodeEditor::CodeEditor(MainWindow* parent, openide::AppSettings* settings)
     layout->addWidget(this, 0, 1);
     this->setVisible(false);
 
-    // default callback (no-op) to prevent crashes
-    m_dirtyTabCallback = []{};
-
     // handler for dirty state (modified since last save)
     connect(this->document(), &QTextDocument::modificationChanged, this, [this](bool modified){
         m_isModified = modified;
-        if (modified) m_dirtyTabCallback();
+        if (modified) {
+            emit fileModified();
+        }
     });
 
     // Line number area setup
     m_lineNumberArea = new LineNumberArea(this);
+    m_lineNumberArea->setAttribute(Qt::WA_OpaquePaintEvent);
+    m_lineNumberArea->setAutoFillBackground(false);
     
     connect(this, &CodeEditor::blockCountChanged, this, &CodeEditor::updateLineNumberAreaWidth);
     connect(this, &CodeEditor::updateRequest, this, &CodeEditor::updateLineNumberArea);
@@ -82,10 +83,6 @@ void CodeEditor::setComponentVisible(bool isVisible)
     this->setVisible(isVisible);
 }
 
-void CodeEditor::attachDirtyTabCallback(std::function<void()> callback)
-{
-    m_dirtyTabCallback = std::move(callback);
-}
 
 void CodeEditor::loadFile(const QString& path, enum FileType fileType)
 {
@@ -188,7 +185,8 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent* event)
     QColor bgColor = m_isDarkTheme 
         ? QColor(45, 45, 45)    // Dark gray for dark theme
         : QColor(240, 240, 240); // Light gray for light theme
-    painter.fillRect(event->rect(), bgColor);
+    // Fill the entire widget area, not just the event rect, to ensure complete background update
+    painter.fillRect(m_lineNumberArea->rect(), bgColor);
     
     QTextBlock block = firstVisibleBlock();
     int blockNumber = block.blockNumber();
@@ -222,8 +220,13 @@ void CodeEditor::updateTheme(bool isDarkTheme)
     m_isDarkTheme = isDarkTheme;
     highlightCurrentLine();
     if (m_lineNumberArea) {
+        // Force complete repaint of the line number area
+        m_lineNumberArea->setAttribute(Qt::WA_OpaquePaintEvent);
         m_lineNumberArea->update();
+        m_lineNumberArea->repaint();
     }
+    // Also update the viewport
+    viewport()->update();
 }
 
 void CodeEditor::applySettings(openide::AppSettings* settings)

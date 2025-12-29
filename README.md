@@ -35,17 +35,14 @@ These are the features that I eventually want to implement (in no particular ord
     * ProjectTree - new/rename/delete files/directories, collapse/collapse all, etc.
     * CodeTabPane - close all/close all others, split vertical/horizontal
     * CodeEditor - view definitions/implementation, refactor, etc.
-* Line numbers
 * Vim motions
 * Tree sitter for actual proper syntax highlighting (currently using regex as a placeholder)
-* Creating new projects
 * Adding build/run configurations (and saving/exporting them)
 * Find/replace
 * Highlight-tabbing (select a portion of text and press tab - should tab everything)
 * Smart indenting (e.g., pressing enter and having the next line tab up correctly)
 * Proper keyword dictionaries for common languages (what I have now is just a placeholder to see some highlighting)
 * Support for custom themes (+ importing/exporting themes)
-* Settings menu for various things (tab spaces, font size, default theme, etc.)
 * Adjust font size with Ctrl+Scroll
 * Adjust scale of UI somehow (configurable in settings)
 * Split code views vertically/horizontally
@@ -53,6 +50,7 @@ These are the features that I eventually want to implement (in no particular ord
 * Git integration
 * Code traversal (goto definition/implementation, etc.)
 * Overhaul of the styling to make it actually look bearable on the eyes
+* Support for language server protocols, error highlighting/syntax checking, etc.
 
 ## License
 This Qt project is licensed under LPGLv3

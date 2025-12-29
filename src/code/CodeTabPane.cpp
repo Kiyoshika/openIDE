@@ -50,14 +50,17 @@ CodeTabPane::CodeTabPane(MainWindow *parent)
 void CodeTabPane::addTab(CodeEditor* editor, const QString& tabName)
 {
     if (!editor) return;
-    // attach the dirtyTabCallback to the editor to mark when the file
-    // is edited to update the tab text
-    editor->attachDirtyTabCallback([this](){
-        int index = QTabWidget::currentIndex();
-        dirtyTabByIndex_(index);
-
-    });
     QTabWidget::addTab(editor, tabName);
+    
+    // Connect the fileModified signal to mark when the file is edited
+    // Capture the index of this specific editor
+    connect(editor, &CodeEditor::fileModified, this, [this, editor](){
+        int index = QTabWidget::indexOf(editor);
+        if (index >= 0) {
+            dirtyTabByIndex_(index);
+        }
+    });
+    
     setCurrentWidget(editor);
 }
 
@@ -87,8 +90,8 @@ void CodeTabPane::saveFileByIndex_(int index)
     if (editor->isModified())
     {
         editor->saveFile();
-        undirtyTabByIndex_(index);
         editor->setModified(false);
+        undirtyTabByIndex_(index);
     }
 }
 

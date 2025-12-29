@@ -8,8 +8,8 @@
 using namespace openide::menu;
 
 ThemeMenu::ThemeMenu(MainWindow* parent, QMenuBar* menuBar)
-    : QMenu(parent ? parent->getCentralWidget() : parent)
-    , m_currentTheme(Theme::System)
+    : QMenu(parent)
+    , m_currentTheme(ThemeMenu::Theme::System)
 {
     if (!parent || !menuBar) return;
 
@@ -41,25 +41,23 @@ ThemeMenu::ThemeMenu(MainWindow* parent, QMenuBar* menuBar)
     connect(m_lightThemeAction, &QAction::triggered, this, &ThemeMenu::onLightThemeTriggered);
     connect(m_darkThemeAction, &QAction::triggered, this, &ThemeMenu::onDarkThemeTriggered);
     
-    // Apply system theme by default
-    detectSystemTheme();
-    applyTheme(Theme::System);
+    // Don't apply theme in constructor - let MainWindow do it after connections are set up
 }
 
 void ThemeMenu::onLightThemeTriggered()
 {
-    applyTheme(Theme::Light);
+    applyTheme(ThemeMenu::Theme::Light);
 }
 
 void ThemeMenu::onDarkThemeTriggered()
 {
-    applyTheme(Theme::Dark);
+    applyTheme(ThemeMenu::Theme::Dark);
 }
 
 void ThemeMenu::onSystemThemeTriggered()
 {
     detectSystemTheme();
-    applyTheme(Theme::System);
+    applyTheme(ThemeMenu::Theme::System);
 }
 
 void ThemeMenu::detectSystemTheme()
@@ -68,12 +66,12 @@ void ThemeMenu::detectSystemTheme()
     // The actual detection happens in applyTheme when System theme is selected
 }
 
-void ThemeMenu::applyTheme(Theme theme)
+void ThemeMenu::applyTheme(ThemeMenu::Theme theme)
 {
     QApplication* app = qApp;
-    Theme actualTheme = theme;
+    ThemeMenu::Theme actualTheme = theme;
     
-    if (theme == Theme::System) {
+    if (theme == ThemeMenu::Theme::System) {
         // Reset to system default
         app->setStyle(QStyleFactory::create("Fusion"));
         QPalette systemPalette;
@@ -83,9 +81,9 @@ void ThemeMenu::applyTheme(Theme theme)
         QPalette palette = QApplication::palette();
         QColor bgColor = palette.color(QPalette::Window);
         int luminance = (299 * bgColor.red() + 587 * bgColor.green() + 114 * bgColor.blue()) / 1000;
-        actualTheme = (luminance < 128) ? Theme::Dark : Theme::Light;
-        m_currentTheme = Theme::System;
-    } else if (theme == Theme::Light) {
+        actualTheme = (luminance < 128) ? ThemeMenu::Theme::Dark : ThemeMenu::Theme::Light;
+        m_currentTheme = ThemeMenu::Theme::System;
+    } else if (theme == ThemeMenu::Theme::Light) {
         // Apply light theme
         app->setStyle(QStyleFactory::create("Fusion"));
         QPalette palette;
@@ -103,9 +101,9 @@ void ThemeMenu::applyTheme(Theme theme)
         palette.setColor(QPalette::Highlight, QColor(0, 120, 215));
         palette.setColor(QPalette::HighlightedText, QColor(255, 255, 255));
         app->setPalette(palette);
-        m_currentTheme = Theme::Light;
-        actualTheme = Theme::Light;
-    } else if (theme == Theme::Dark) {
+        m_currentTheme = ThemeMenu::Theme::Light;
+        actualTheme = ThemeMenu::Theme::Light;
+    } else if (theme == ThemeMenu::Theme::Dark) {
         // Apply dark theme
         app->setStyle(QStyleFactory::create("Fusion"));
         QPalette palette;
@@ -123,8 +121,8 @@ void ThemeMenu::applyTheme(Theme theme)
         palette.setColor(QPalette::Highlight, QColor(42, 130, 218));
         palette.setColor(QPalette::HighlightedText, QColor(0, 0, 0));
         app->setPalette(palette);
-        m_currentTheme = Theme::Dark;
-        actualTheme = Theme::Dark;
+        m_currentTheme = ThemeMenu::Theme::Dark;
+        actualTheme = ThemeMenu::Theme::Dark;
     }
     
     // Emit the actual theme (Light or Dark) for CodeEditor updates

@@ -5,7 +5,6 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QFontDatabase>
-#include <QDebug>
 
 using namespace openide;
 
@@ -87,7 +86,6 @@ bool AppSettings::loadFromFile()
     }
     
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qDebug() << "Failed to open config file for reading:" << configPath;
         setDefaults();
         return false;
     }
@@ -100,7 +98,6 @@ bool AppSettings::loadFromFile()
     QJsonDocument doc = QJsonDocument::fromJson(jsonContent.toUtf8(), &error);
     
     if (error.error != QJsonParseError::NoError) {
-        qDebug() << "Failed to parse config file:" << error.errorString();
         setDefaults();
         return false;
     }
@@ -129,7 +126,6 @@ bool AppSettings::saveToFile() const
     QFile file(configPath);
     
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qDebug() << "Failed to open config file for writing:" << configPath;
         return false;
     }
     

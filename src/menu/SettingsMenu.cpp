@@ -7,7 +7,7 @@ using namespace openide;
 using namespace openide::menu;
 
 SettingsMenu::SettingsMenu(MainWindow* parent, QMenuBar* menuBar, AppSettings* settings)
-    : QMenu(parent ? parent->getCentralWidget() : parent)
+    : QMenu(parent)
     , m_mainWindow(parent)
     , m_settings(settings)
 {

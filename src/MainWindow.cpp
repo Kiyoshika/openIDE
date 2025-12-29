@@ -18,16 +18,15 @@ MainWindow::MainWindow(QWidget *parent)
     , m_layout(new QGridLayout(m_centralWidget))
     , m_projectTree(this)
     , m_codeTabPane(this)
-    , m_fileMenu(this, this->menuBar(), &m_projectTree,
-        // saveFileCallback
-        [this](){m_codeTabPane.saveActiveFile();},
-         // saveAllFilesCallback
-        [this](){m_codeTabPane.saveAllActiveFiles();})
+    , m_fileMenu(this, this->menuBar(), &m_projectTree, &m_codeTabPane)
     , m_themeMenu(this, this->menuBar())
     , m_settingsMenu(this, this->menuBar(), &m_appSettings)
 {
     // Load settings on startup
     m_appSettings.loadFromFile();
+    
+    // Initialize window title
+    setWindowTitle("openIDE");
     
     QMainWindow::resize(1200, 800);
     setCentralWidget(m_centralWidget);
@@ -39,16 +38,12 @@ MainWindow::MainWindow(QWidget *parent)
 
     /* CALLBACKS/HANDLER INITIALIZATION */
 
-    // double clicking file on project tree populates code editor
-    // TODO: move this to the actual ProjectTree class ctor isntead of main window
-    QObject::connect(m_projectTree.getTreeView(), &QTreeView::doubleClicked, this, [this](const QModelIndex& index){
-        m_projectTree.onClick(m_codeTabPane, index, &m_appSettings);
-    });
+    // ProjectTree handles file opening internally now
     
     // Connect theme changes to update all code editors
     // The themeChanged signal emits the actual theme (Light or Dark), not System
-    connect(&m_themeMenu, &openide::menu::ThemeMenu::themeChanged, this, [this](openide::menu::Theme theme){
-        bool isDark = (theme == openide::menu::Theme::Dark);
+    connect(&m_themeMenu, &openide::menu::ThemeMenu::themeChanged, this, [this](openide::menu::ThemeMenu::Theme theme){
+        bool isDark = (theme == openide::menu::ThemeMenu::Theme::Dark);
         m_codeTabPane.updateAllEditorsTheme(isDark);
     });
     
@@ -56,6 +51,30 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&m_settingsMenu, &openide::menu::SettingsMenu::settingsChanged, this, [this](){
         m_codeTabPane.updateAllEditorsSettings(&m_appSettings);
     });
+    
+    // Connect project opened signal to update title
+    connect(&m_fileMenu, &openide::menu::FileMenu::projectOpened, this, &MainWindow::onProjectOpened);
+    
+    // Now that all connections are set up, apply the initial theme
+    m_themeMenu.applyTheme(openide::menu::ThemeMenu::Theme::System);
+}
+
+void MainWindow::onProjectOpened(const QString& projectPath, const QString& projectName)
+{
+    // Normalize the path to ensure it's stored correctly
+    QDir dir(projectPath);
+    m_currentProjectRoot = dir.absolutePath();
+    setProjectTitle(projectName);
+}
+
+void MainWindow::setProjectTitle(const QString& projectName)
+{
+    m_currentProjectName = projectName;
+    if (projectName.isEmpty()) {
+        setWindowTitle("openIDE");
+    } else {
+        setWindowTitle("openIDE - " + projectName);
+    }
 }
 
 QWidget* MainWindow::getCentralWidget() const
@@ -70,8 +89,8 @@ QGridLayout* MainWindow::getLayout() const
 
 void MainWindow::setComponentsVisible(bool isVisible)
 {
-    this->m_projectTree.setComponentVisible(true);
-    this->m_codeTabPane.setComponentVisible(true);
+    m_projectTree.setVisible(isVisible);
+    m_codeTabPane.setComponentVisible(isVisible);
 }
 
 MainWindow::~MainWindow()

@@ -32,7 +32,6 @@ public:
     CodeEditor(MainWindow* parent = nullptr, openide::AppSettings* settings = nullptr);
     void setComponentVisible(bool isVisible);
     void applySettings(openide::AppSettings* settings);
-    void attachDirtyTabCallback(std::function<void()> callback);
     const QString& getFilePath() const;
     void loadFile(const QString& path, enum FileType fileType);
     void saveFile() const;
@@ -40,6 +39,9 @@ public:
     bool isModified() const;
     void updateTheme(bool isDarkTheme);
     ~CodeEditor() = default;
+    
+signals:
+    void fileModified();
 protected:
     void resizeEvent(QResizeEvent* event) override;
 private slots:
@@ -50,11 +52,11 @@ private:
     int lineNumberAreaWidth();
     void lineNumberAreaPaintEvent(QPaintEvent* event);
     
+    MainWindow* m_parent;
     bool m_isDarkTheme;
     bool m_isModified;
     QString m_filePath;
     openide::SyntaxHighlighter m_syntaxHighlighter;
-    std::function<void()> m_dirtyTabCallback;
     LineNumberArea* m_lineNumberArea;
 };
 
