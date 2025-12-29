@@ -9,6 +9,16 @@ This is a Qt6 cmake project, so install the following (below is for linux, your 
 sudo apt-get install cmake qtcreator build-essential libgl1-mesa-dev qt6-base-dev qt6-tools-dev-tools
 ```
 
+**IMPORTANT**: When cloning the repository, use the `--recursive` flag to include Tree-sitter submodules:
+```bash
+git clone --recursive https://github.com/Kiyoshika/openIDE.git
+```
+
+If you've already cloned without `--recursive`, initialize the submodules:
+```bash
+git submodule update --init --recursive
+```
+
 ### Building with QtCreator
 If building with QtCreator, just `File > Open File or Project` and select the root `CMakeLists.txt`. Everything should configure automaticaly after importing. 
 
@@ -25,35 +35,37 @@ Check out the github [releases](https://github.com/Kiyoshika/openIDE/tags) for s
 **WARNING**: The `main` branch may be unstable as it is the active development/experimental branch. Stick to releases for the "stable"-ish builds.
 
 ## Preview 
-Below is a preview of the `0.2.0` build on `2025 December 27`
+Below is a preview of the `0.1.0` build on `2025 December 26`
 
-<img width="1195" height="830" alt="image" src="https://github.com/user-attachments/assets/0a29015b-b787-43b3-9ed1-da9e956f1615" />
+<img width="812" height="632" alt="image" src="https://github.com/user-attachments/assets/8a88f855-b5f5-4a40-941d-53da80290aaf" />
 
 ## Wishlist
 These are the features that I eventually want to implement (in no particular order)
 * Right-click context menus
-    * ProjectTree - new/rename/delete files/directories, collapse/collapse all, etc.
-    * CodeTabPane - close all/close all others, split vertical/horizontal
-    * CodeEditor - view definitions/implementation, refactor, etc.
-* Line numbers
+    * CodeEditor - view definitions/implementation, refactor, etc. (need LSP first)
 * Vim motions
-* Tree sitter for actual proper syntax highlighting (currently using regex as a placeholder)
-* Creating new projects
 * Adding build/run configurations (and saving/exporting them)
-* Find/replace
-* Highlight-tabbing (select a portion of text and press tab - should tab everything)
-* Smart indenting (e.g., pressing enter and having the next line tab up correctly)
-* Proper keyword dictionaries for common languages (what I have now is just a placeholder to see some highlighting)
 * Support for custom themes (+ importing/exporting themes)
-* Settings menu for various things (tab spaces, font size, default theme, etc.)
-* Adjust font size with Ctrl+Scroll
 * Adjust scale of UI somehow (configurable in settings)
 * Split code views vertically/horizontally
 * File diffing
 * Git integration
 * Code traversal (goto definition/implementation, etc.)
 * Overhaul of the styling to make it actually look bearable on the eyes
-* Integrated terminal
+* Support for language server protocols, error highlighting/syntax checking, etc.
+* Setting up breakpoints and debugging
+
+## Third-Party Libraries
+
+### Tree-sitter
+This project uses [Tree-sitter](https://github.com/tree-sitter/tree-sitter) for syntax highlighting and parsing.
+
+**License:** MIT License  
+**Copyright:** © 2018-2024 Max Brunsfeld
+
+Tree-sitter is an incremental parsing system for programming tools. We use it to provide accurate, efficient syntax highlighting across 20+ programming languages including C, C++, Python, Java, JavaScript, TypeScript, Go, Rust, C#, Ruby, PHP, Swift, Kotlin, HTML, CSS, SQL, Shell, Markdown, JSON, XML, and YAML.
+
+Full license text available at: `external/tree-sitter/LICENSE`
 
 ## License
 This Qt project is licensed under LPGLv3

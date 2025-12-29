@@ -23,8 +23,7 @@ public:
         MainWindow* parent,
         QMenuBar* menuBar,
         ProjectTree* projectTree,
-        std::function<void()> saveFileCallback,
-        std::function<void()> saveAllFilesCallback);
+        openide::code::CodeTabPane* codeTabPane);
     ~FileMenu() = default;
 
     /**
@@ -40,10 +39,25 @@ public:
      * @param Path to the selected directory (empty if none)
      */
     void openDir(QWidget* parent, QString* dirPath);
+    
+signals:
+    void projectOpened(const QString& projectPath, const QString& projectName);
+    
+public:
+    void setProjectActionsEnabled(bool enabled);
+    
+private slots:
+    void onNewProjectTriggered();
+    void onOpenProjectTriggered();
+    void onNewFileTriggered();
+    
 private:
+    MainWindow* m_mainWindow;
     openide::ProjectTree* m_projectTree;
-    std::function<void()> m_saveFileCallback;
-    std::function<void()> m_saveAllFilesCallback;
+    openide::code::CodeTabPane* m_codeTabPane;
+    QAction* m_saveAction;
+    QAction* m_saveAllAction;
+    QAction* m_newFileAction;
 };
 }
 
