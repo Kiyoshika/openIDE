@@ -3,12 +3,29 @@ This is an open source IDE that you can hack apart, use as a foundation, or prac
 
 This is not a glorious, production-grade IDE, I simply wrote this because I was bored.
 
-## Building
-This is a Qt6 cmake project, so install the following (below is for linux, your OS may differ):
+### Known Issues
+Some known issues that should get addressed:
+* (`v0.1.0+`) File tree on MacOS is sorted ascending regardless of directory/file (directories should always show first)
+  * This may just be a limitation with QTreeView on MacOS, but maybe can find some workarounds
+
+# Building from Source
+This is a Qt6 cmake project. Install the prerequisites and follow the build instructions below:
+## Prerequisites
+Install the following dependencies based on your OS. Be sure you have a C11 and C++17 compatible compiler (gcc, clang, msvc, etc.)
+### Linux
 ```
 sudo apt-get install cmake qtcreator build-essential libgl1-mesa-dev qt6-base-dev qt6-tools-dev-tools
 ```
 
+### MacOS
+```
+brew install cmake qt@6
+```
+
+### Windows
+Recommended to install the QtCreator on windows which will also install other dependencies for you: https://doc.qt.io/qtcreator/creator-how-to-install.html
+
+## Cloning and Building
 **IMPORTANT**: When cloning the repository, use the `--recursive` flag to include Tree-sitter submodules:
 ```bash
 git clone --recursive https://github.com/Kiyoshika/openIDE.git
@@ -55,6 +72,8 @@ These are the features that I eventually want to implement (in no particular ord
 * Add fuzzy finder to search files or content within files
 * Live file reads - as of now, if a change to a file is made externally, it must be closed and re-opened. But, like other editors, I'd like to have a live view of the file to reflect external changes immediately (need some thought on how to do this properly and handling conflicts such as editing a file while a change happened externally) - we can also potentially poll for file metadata and checking if it has been updated since we've opened it and display a message if we want to load the changes (if the file has unsaved changes) or if the file is clean, automatically read the external changes]
 * Code formatting
+* Code folding/unfolding (fold/unfold current method or all methods in file, etc.)
+* Write an installer to package things up (e.g., we are reading scm files for tree sitter which right now just traverses up some directories where the executable is - this won't work for a "real" distributable unless we manage where these external dependencies are in a predictable way. Also provide the option to install external tools for the user)
 
 ## Roadmap
 Below is the rough roadmap for the next release(s) targeting major features I want to accomplish
