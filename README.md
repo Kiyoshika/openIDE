@@ -53,7 +53,8 @@ These are the features that I eventually want to implement (in no particular ord
 * Support for language server protocols, error highlighting/syntax checking, etc.
 * Setting up breakpoints and debugging
 * Add fuzzy finder to search files or content within files
-* Live file reads - as of now, if a change to a file is made externally, it must be closed and re-opened. But, like other editors, I'd like to have a live view of the file to reflect external changes immediately (need some thought on how to do this properly and handling conflicts such as editing a file while a change happened externally) - we can also potentially poll for file metadata and checking if it has been updated since we've opened it and display a message if we want to load the changes (if the file has unsaved changes) or if the file is clean, automatically read the external changes
+* Live file reads - as of now, if a change to a file is made externally, it must be closed and re-opened. But, like other editors, I'd like to have a live view of the file to reflect external changes immediately (need some thought on how to do this properly and handling conflicts such as editing a file while a change happened externally) - we can also potentially poll for file metadata and checking if it has been updated since we've opened it and display a message if we want to load the changes (if the file has unsaved changes) or if the file is clean, automatically read the external changes]
+* Code formatting
 
 ## Roadmap
 Below is the rough roadmap for the next release(s) targeting major features I want to accomplish
@@ -77,6 +78,7 @@ This release will focus entirely on language server support to be able to traver
 * Add a new menu `Settings > Language Server` to select a language server to use for the specified language(s) - this will assume the user has them installed and will not install them for you (yet)
   * Probably need to also specify a command on how to invoke/start the language server which is triggered when opening a file type corresponding to the given LSP
 * If LSP is configured when opening relevant file type, need to way to invoke the command, receive information, parse it and display relevant information on the code editor as well as supporting events to click on method names, view references, goto definitions, etc.
+* Possibly throw in the code formatting in this release `Settings > Code Formatting` which will have a similar setup to the LSP (external tool + applies to specific files opened), add a context menu item "Format Code". Also add the ability in settings to provide additional arguments to the formatter of choice
 
 ### v0.6.0 Roadmap
 This release will focus entirely on debugging.
