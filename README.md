@@ -52,6 +52,40 @@ These are the features that I eventually want to implement (in no particular ord
 * Code traversal (goto definition/implementation, etc.)
 * Support for language server protocols, error highlighting/syntax checking, etc.
 * Setting up breakpoints and debugging
+* Add fuzzy finder to search files or content within files
+* Live file reads - as of now, if a change to a file is made externally, it must be closed and re-opened. But, like other editors, I'd like to have a live view of the file to reflect external changes immediately (need some thought on how to do this properly and handling conflicts such as editing a file while a change happened externally) - we can also potentially poll for file metadata and checking if it has been updated since we've opened it and display a message if we want to load the changes (if the file has unsaved changes) or if the file is clean, automatically read the external changes
+
+## Roadmap
+Below is the rough roadmap for the next release(s) targeting major features I want to accomplish
+
+### v0.4.0 Roadmap
+The goal of this release is to add the remaining piece to be able to actually write software entirely within openIDE. With a functioning editor, file traversal and integrated terminal, this fully completes the bare minimum development loop.
+* Integrated terminal
+   * This alone might be pretty complex, quick google search doesn't seem to be supported out of the box so will have to be a custom implementation
+* Run configurations
+   * When creating/opening a project, it will create a `.openide/` directory to store run configurations (this can be gitignored) and other settings later
+   * There will be a dropdown on the right-hand side for the current selected configuration (default `<none>`) and an option to create a new configuration
+   * Through the `Build` menu (to be created) you can:
+      * Edit configurations (run, build, test, eventually debug)
+      * Run/Build/Test (which will use above-mentioned configurations) - these will open 
+   * The configurations themselves are just wrappers around commands that you specify (e.g., `cmake .. && make` within a specified build directory)
+   * For some languages, defaults will be provided to reduce manual work (e.g., cmake for C/C++, gradle/maven for Java, pyenv/pip for Python, etc.)
+   * The required build tools (e.g., cmake, gradle, etc.) will NOT be packaged and assumed user has them installed - however, if we write an installer for openIDE, perhaps we could provide the option to isntall tools if needed
+
+### v0.5.0 Roadmap
+This release will focus entirely on language server support to be able to traverse through code, highlight syntax errors and provide other useful development information
+* Add a new menu `Settings > Language Server` to select a language server to use for the specified language(s) - this will assume the user has them installed and will not install them for you (yet)
+  * Probably need to also specify a command on how to invoke/start the language server which is triggered when opening a file type corresponding to the given LSP
+* If LSP is configured when opening relevant file type, need to way to invoke the command, receive information, parse it and display relevant information on the code editor as well as supporting events to click on method names, view references, goto definitions, etc.
+
+There's a lot of complexity involved with this, so the entire v0.5.0 release will likely only be focused on language server support
+
+### v0.6.0 Roadmap
+This release will focus entirely on debugging.
+* Add debuggers to the configurations introduced in `v0.4.0`
+* Set regular/conditional breakpoints (or maybe regular breakpoints to get started) in the editor
+* Be able to step through code, run expressions, view variables/stack information
+ 
 
 ## Third-Party Libraries
 
