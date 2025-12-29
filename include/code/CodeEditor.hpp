@@ -36,6 +36,7 @@ public:
     void saveFile() const;
     void setModified(bool isModified);
     bool isModified() const;
+    void updateTheme(bool isDarkTheme);
     ~CodeEditor() = default;
 protected:
     void resizeEvent(QResizeEvent* event) override;
@@ -47,6 +48,7 @@ private:
     int lineNumberAreaWidth();
     void lineNumberAreaPaintEvent(QPaintEvent* event);
     
+    bool m_isDarkTheme;
     bool m_isModified;
     QString m_filePath;
     openide::SyntaxHighlighter m_syntaxHighlighter;

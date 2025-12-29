@@ -18,6 +18,7 @@ public:
   void saveActiveFile();
   void saveAllActiveFiles();
   bool fileIsOpen(const QString& path) const;
+  void updateAllEditorsTheme(bool isDarkTheme);
   ~CodeTabPane() = default;
 
 private:

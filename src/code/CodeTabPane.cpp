@@ -119,3 +119,14 @@ bool CodeTabPane::fileIsOpen(const QString& path) const
 
     return false;
 }
+
+void CodeTabPane::updateAllEditorsTheme(bool isDarkTheme)
+{
+    for (int i = 0; i < QTabWidget::count(); ++i)
+    {
+        CodeEditor* editor = qobject_cast<CodeEditor*>(QTabWidget::widget(i));
+        if (editor) {
+            editor->updateTheme(isDarkTheme);
+        }
+    }
+}

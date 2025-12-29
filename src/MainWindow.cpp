@@ -1,6 +1,8 @@
 #include "MainWindow.hpp"
 #include "ProjectTree.hpp"
 #include "code/CodeTabPane.hpp"
+#include "menu/ThemeMenu.hpp"
+#include <QApplication>
 
 using namespace openide;
 
@@ -19,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
         [this](){m_codeTabPane.saveActiveFile();},
          // saveAllFilesCallback
         [this](){m_codeTabPane.saveAllActiveFiles();})
+    , m_themeMenu(this, this->menuBar())
 {
     QMainWindow::resize(1200, 800);
     setCentralWidget(m_centralWidget);
@@ -34,6 +37,13 @@ MainWindow::MainWindow(QWidget *parent)
     // TODO: move this to the actual ProjectTree class ctor isntead of main window
     QObject::connect(m_projectTree.getTreeView(), &QTreeView::doubleClicked, this, [this](const QModelIndex& index){
         m_projectTree.onClick(m_codeTabPane, index);
+    });
+    
+    // Connect theme changes to update all code editors
+    // The themeChanged signal emits the actual theme (Light or Dark), not System
+    connect(&m_themeMenu, &openide::menu::ThemeMenu::themeChanged, this, [this](openide::menu::Theme theme){
+        bool isDark = (theme == openide::menu::Theme::Dark);
+        m_codeTabPane.updateAllEditorsTheme(isDark);
     });
 }
 

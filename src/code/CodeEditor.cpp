@@ -5,6 +5,7 @@
 #include <QResizeEvent>
 #include <QScrollBar>
 #include <QFontDatabase>
+#include <QApplication>
 
 using namespace openide::code;
 
@@ -13,6 +14,7 @@ CodeEditor::CodeEditor(MainWindow* parent)
     , m_syntaxHighlighter{this->document()}
     , m_isModified{false}
     , m_lineNumberArea{nullptr}
+    , m_isDarkTheme{false}
 {
     if (!parent) return;
 
@@ -53,6 +55,13 @@ CodeEditor::CodeEditor(MainWindow* parent)
     connect(this, &CodeEditor::cursorPositionChanged, this, &CodeEditor::highlightCurrentLine);
     
     updateLineNumberAreaWidth(0);
+    
+    // Detect initial theme from system
+    QPalette palette = QApplication::palette();
+    QColor bgColor = palette.color(QPalette::Window);
+    int luminance = (299 * bgColor.red() + 587 * bgColor.green() + 114 * bgColor.blue()) / 1000;
+    m_isDarkTheme = (luminance < 128);
+    
     highlightCurrentLine();
 }
 
@@ -156,8 +165,10 @@ void CodeEditor::highlightCurrentLine()
     if (!isReadOnly()) {
         QTextEdit::ExtraSelection selection;
         
-        // Use a subtle, semi-transparent color that works well with dark themes
-        QColor lineColor = QColor(255, 255, 255, 20); // Very subtle white with low opacity
+        // Use theme-appropriate subtle highlight color
+        QColor lineColor = m_isDarkTheme 
+            ? QColor(255, 255, 255, 20)  // Subtle white for dark theme
+            : QColor(0, 0, 0, 10);       // Subtle black for light theme
         
         selection.format.setBackground(lineColor);
         selection.format.setProperty(QTextFormat::FullWidthSelection, true);
@@ -172,8 +183,11 @@ void CodeEditor::highlightCurrentLine()
 void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent* event)
 {
     QPainter painter(m_lineNumberArea);
-    // Use a darker background that works better with dark themes
-    painter.fillRect(event->rect(), QColor(45, 45, 45));
+    // Use theme-appropriate background
+    QColor bgColor = m_isDarkTheme 
+        ? QColor(45, 45, 45)    // Dark gray for dark theme
+        : QColor(240, 240, 240); // Light gray for light theme
+    painter.fillRect(event->rect(), bgColor);
     
     QTextBlock block = firstVisibleBlock();
     int blockNumber = block.blockNumber();
@@ -186,7 +200,11 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent* event)
     while (block.isValid() && top <= event->rect().bottom()) {
         if (block.isVisible() && bottom >= event->rect().top()) {
             QString number = QString::number(blockNumber + 1);
-            painter.setPen(QColor(170, 170, 170)); // Light gray text for dark theme
+            // Use theme-appropriate text color
+            QColor textColor = m_isDarkTheme 
+                ? QColor(170, 170, 170)  // Light gray for dark theme
+                : QColor(100, 100, 100); // Dark gray for light theme
+            painter.setPen(textColor);
             painter.drawText(0, top, m_lineNumberArea->width() - 3, fontMetrics().height(),
                            Qt::AlignRight, number);
         }
@@ -195,5 +213,14 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent* event)
         top = bottom;
         bottom = top + qRound(blockBoundingRect(block).height());
         ++blockNumber;
+    }
+}
+
+void CodeEditor::updateTheme(bool isDarkTheme)
+{
+    m_isDarkTheme = isDarkTheme;
+    highlightCurrentLine();
+    if (m_lineNumberArea) {
+        m_lineNumberArea->update();
     }
 }
