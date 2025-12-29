@@ -175,6 +175,176 @@ void CodeEditor::resizeEvent(QResizeEvent* event)
     m_lineNumberArea->setGeometry(QRect(cr.left(), cr.top(), lineNumberAreaWidth(), cr.height()));
 }
 
+void CodeEditor::keyPressEvent(QKeyEvent* event)
+{
+    QTextCursor cursor = textCursor();
+    
+    // Handle Tab key with selection - indent all selected lines
+    if (event->key() == Qt::Key_Tab && cursor.hasSelection()) {
+        int selectionStart = cursor.selectionStart();
+        int selectionEnd = cursor.selectionEnd();
+        
+        // Find the blocks (lines) that are selected
+        QTextBlock startBlock = document()->findBlock(selectionStart);
+        QTextBlock endBlock = document()->findBlock(selectionEnd);
+        
+        // Calculate indent string based on tab stop distance
+        QFontMetricsF metrics(font());
+        int spacesPerTab = static_cast<int>(tabStopDistance() / metrics.horizontalAdvance(' '));
+        QString indent = QString(spacesPerTab, ' ');
+        
+        // Begin edit block for undo/redo
+        cursor.beginEditBlock();
+        
+        // Iterate through all selected lines and indent them
+        QTextBlock block = startBlock;
+        while (block.isValid()) {
+            cursor.setPosition(block.position());
+            cursor.insertText(indent);
+            
+            if (block == endBlock)
+                break;
+            block = block.next();
+        }
+        
+        cursor.endEditBlock();
+        
+        // Restore selection with adjusted positions
+        cursor.setPosition(startBlock.position());
+        cursor.setPosition(endBlock.position() + endBlock.length() - 1, QTextCursor::KeepAnchor);
+        setTextCursor(cursor);
+        
+        event->accept();
+        return;
+    }
+    
+    // Handle Shift+Tab with selection - unindent all selected lines
+    if (event->key() == Qt::Key_Backtab && cursor.hasSelection()) {
+        int selectionStart = cursor.selectionStart();
+        int selectionEnd = cursor.selectionEnd();
+        
+        // Find the blocks (lines) that are selected
+        QTextBlock startBlock = document()->findBlock(selectionStart);
+        QTextBlock endBlock = document()->findBlock(selectionEnd);
+        
+        // Calculate spaces per tab
+        QFontMetricsF metrics(font());
+        int spacesPerTab = static_cast<int>(tabStopDistance() / metrics.horizontalAdvance(' '));
+        
+        // Begin edit block for undo/redo
+        cursor.beginEditBlock();
+        
+        // Iterate through all selected lines and unindent them
+        QTextBlock block = startBlock;
+        while (block.isValid()) {
+            cursor.setPosition(block.position());
+            QString text = block.text();
+            
+            // Remove up to spacesPerTab spaces from the beginning
+            int spacesToRemove = 0;
+            for (int i = 0; i < spacesPerTab && i < text.length(); ++i) {
+                if (text[i] == ' ') {
+                    spacesToRemove++;
+                } else {
+                    break;
+                }
+            }
+            
+            if (spacesToRemove > 0) {
+                cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, spacesToRemove);
+                cursor.removeSelectedText();
+            }
+            
+            if (block == endBlock)
+                break;
+            block = block.next();
+        }
+        
+        cursor.endEditBlock();
+        
+        // Restore selection with adjusted positions
+        cursor.setPosition(startBlock.position());
+        cursor.setPosition(endBlock.position() + endBlock.length() - 1, QTextCursor::KeepAnchor);
+        setTextCursor(cursor);
+        
+        event->accept();
+        return;
+    }
+    
+    // Handle Enter key - smart auto-indentation
+    if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter) {
+        // Get current line text
+        QTextBlock currentBlock = cursor.block();
+        QString currentLineText = currentBlock.text();
+        
+        // Calculate leading whitespace
+        int indentCount = 0;
+        for (const QChar& ch : currentLineText) {
+            if (ch == ' ') {
+                indentCount++;
+            } else if (ch == '\t') {
+                // Convert tabs to spaces based on tab stop distance
+                QFontMetricsF metrics(font());
+                int spacesPerTab = static_cast<int>(tabStopDistance() / metrics.horizontalAdvance(' '));
+                indentCount += spacesPerTab;
+            } else {
+                break;
+            }
+        }
+        
+        // Insert newline followed by the same indentation
+        QString indent = QString(indentCount, ' ');
+        cursor.insertText("\n" + indent);
+        
+        event->accept();
+        return;
+    }
+    
+    // For all other keys, use default behavior
+    QPlainTextEdit::keyPressEvent(event);
+}
+
+void CodeEditor::wheelEvent(QWheelEvent* event)
+{
+    // Handle Ctrl+scroll for font size adjustment
+    if (event->modifiers() & Qt::ControlModifier) {
+        // Get the scroll direction
+        int delta = event->angleDelta().y();
+        
+        if (delta != 0) {
+            // Get current font and size
+            QFont currentFont = font();
+            int currentSize = currentFont.pointSize();
+            
+            // Adjust size based on scroll direction
+            // Clamp between reasonable bounds (6-72)
+            int newSize = currentSize;
+            if (delta > 0) {
+                newSize = qMin(72, currentSize + 1);  // Scroll up = increase
+            } else {
+                newSize = qMax(6, currentSize - 1);   // Scroll down = decrease
+            }
+            
+            // Only update if size actually changed
+            if (newSize != currentSize) {
+                // Save the new font size to settings and persist to file
+                openide::AppSettings* settings = m_parent->getAppSettings();
+                settings->setFontSize(newSize);
+                settings->saveToFile();
+                
+                // Update all open editors with the new settings
+                m_parent->getCodeTabPane()->updateAllEditorsSettings(settings);
+            }
+            
+            event->accept();
+            return;
+        }
+    }
+    
+    // For non-Ctrl scroll or no vertical scroll, use default behavior
+    QPlainTextEdit::wheelEvent(event);
+}
+
 void CodeEditor::highlightCurrentLine()
 {
     QList<QTextEdit::ExtraSelection> extraSelections;

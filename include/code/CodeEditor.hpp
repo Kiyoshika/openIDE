@@ -17,6 +17,8 @@ namespace openide::code { class FindReplaceDialog; }
 #include <QTabWidget>
 #include <QResizeEvent>
 #include <QPaintEvent>
+#include <QKeyEvent>
+#include <QWheelEvent>
 
 #include <functional>
 
@@ -45,6 +47,8 @@ signals:
     void fileModified();
 protected:
     void resizeEvent(QResizeEvent* event) override;
+    void keyPressEvent(QKeyEvent* event) override;
+    void wheelEvent(QWheelEvent* event) override;
 private slots:
     void updateLineNumberAreaWidth(int newBlockCount);
     void highlightCurrentLine();

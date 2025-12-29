@@ -26,7 +26,7 @@ ProjectTree::ProjectTree(MainWindow* parent)
     setHeaderHidden(false);
     setVisible(false);
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
-
+    
     // grid placement
     if (parent && parent->getLayout())
         parent->getLayout()->addWidget(this, 0, 0);
