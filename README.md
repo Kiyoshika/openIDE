@@ -73,6 +73,7 @@ These are the features that I eventually want to implement (in no particular ord
 * Add fuzzy finder to search files or content within files
 * Live file reads - as of now, if a change to a file is made externally, it must be closed and re-opened. But, like other editors, I'd like to have a live view of the file to reflect external changes immediately (need some thought on how to do this properly and handling conflicts such as editing a file while a change happened externally) - we can also potentially poll for file metadata and checking if it has been updated since we've opened it and display a message if we want to load the changes (if the file has unsaved changes) or if the file is clean, automatically read the external changes]
 * Code formatting
+* Code folding/unfolding (fold/unfold current method or all methods in file, etc.)
 
 ## Roadmap
 Below is the rough roadmap for the next release(s) targeting major features I want to accomplish
