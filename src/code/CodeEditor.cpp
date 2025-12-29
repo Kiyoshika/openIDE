@@ -110,9 +110,8 @@ void CodeEditor::loadFile(const QString& path, enum FileType fileType)
     QTextStream inFile(&file);
     QString fileContent = inFile.readAll();
 
-    QStringList keywords = KeywordDictionary::getKeywordsForFileType(fileType);
-
-    m_syntaxHighlighter.setKeywords(keywords);
+    // Set file type for tree-sitter syntax highlighting
+    m_syntaxHighlighter.setFileType(fileType);
     this->setPlainText(fileContent);
     m_syntaxHighlighter.rehighlight();
 
@@ -235,6 +234,11 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent* event)
 void CodeEditor::updateTheme(bool isDarkTheme)
 {
     m_isDarkTheme = isDarkTheme;
+    
+    // Update syntax highlighter theme
+    m_syntaxHighlighter.updateTheme(isDarkTheme);
+    m_syntaxHighlighter.rehighlight();
+    
     highlightCurrentLine();
     if (m_lineNumberArea) {
         // Force complete repaint of the line number area

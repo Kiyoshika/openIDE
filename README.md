@@ -36,11 +36,9 @@ These are the features that I eventually want to implement (in no particular ord
     * CodeTabPane - close all/close all others, split vertical/horizontal
     * CodeEditor - view definitions/implementation, refactor, etc.
 * Vim motions
-* Tree sitter for actual proper syntax highlighting (currently using regex as a placeholder)
 * Adding build/run configurations (and saving/exporting them)
 * Highlight-tabbing (select a portion of text and press tab - should tab everything)
 * Smart indenting (e.g., pressing enter and having the next line tab up correctly)
-* Proper keyword dictionaries for common languages (what I have now is just a placeholder to see some highlighting)
 * Support for custom themes (+ importing/exporting themes)
 * Adjust font size with Ctrl+Scroll
 * Adjust scale of UI somehow (configurable in settings)
@@ -50,6 +48,19 @@ These are the features that I eventually want to implement (in no particular ord
 * Code traversal (goto definition/implementation, etc.)
 * Overhaul of the styling to make it actually look bearable on the eyes
 * Support for language server protocols, error highlighting/syntax checking, etc.
+* Setting up breakpoints and debugging
+
+## Third-Party Libraries
+
+### Tree-sitter
+This project uses [Tree-sitter](https://github.com/tree-sitter/tree-sitter) for syntax highlighting and parsing.
+
+**License:** MIT License  
+**Copyright:** © 2018-2024 Max Brunsfeld
+
+Tree-sitter is an incremental parsing system for programming tools. We use it to provide accurate, efficient syntax highlighting across 20+ programming languages including C, C++, Python, Java, JavaScript, TypeScript, Go, Rust, C#, Ruby, PHP, Swift, Kotlin, HTML, CSS, SQL, Shell, Markdown, JSON, XML, and YAML.
+
+Full license text available at: `external/tree-sitter/LICENSE`
 
 ## License
 This Qt project is licensed under LPGLv3
