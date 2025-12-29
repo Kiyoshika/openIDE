@@ -3,10 +3,16 @@ This is an open source IDE that you can hack apart, use as a foundation, or prac
 
 This is not a glorious, production-grade IDE, I simply wrote this because I was bored.
 
+### Known Issues
+Some known issues that should get addressed:
+* (`v0.3.0`) Syntax highlighting does not work on MacOS
+* (`v0.1.0+`) File tree on MacOS is sorted ascending regardless of directory/file (directories should always show first)
+  * This may just be a limitation with QTreeView on MacOS, but maybe can find some workarounds
+
 # Building from Source
 This is a Qt6 cmake project. Install the prerequisites and follow the build instructions below:
 ## Prerequisites
-Install the following dependencies based on your OS. Be sure you have a C++17 compatible compiler (gcc, clang, msvc, etc.)
+Install the following dependencies based on your OS. Be sure you have a C11 and C++17 compatible compiler (gcc, clang, msvc, etc.)
 ### Linux
 ```
 sudo apt-get install cmake qtcreator build-essential libgl1-mesa-dev qt6-base-dev qt6-tools-dev-tools
