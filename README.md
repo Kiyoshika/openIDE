@@ -5,6 +5,7 @@ This is not a glorious, production-grade IDE, I simply wrote this because I was 
 
 ### Known Issues
 Some known issues that should get addressed:
+* (`v0.3.0`) Code tabs no longer indicate if a file has been changed (i.e., the ` *` appended) - this is a regression introduced after completely refactoring the `CodeTabPane` to implement pane splitting
 * (`v0.3.0`) Syntax highlighting does not work on MacOS
 * (`v0.1.0+`) File tree on MacOS is sorted ascending regardless of directory/file (directories should always show first)
   * This may just be a limitation with QTreeView on MacOS, but maybe can find some workarounds
