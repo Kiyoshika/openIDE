@@ -3,12 +3,24 @@ This is an open source IDE that you can hack apart, use as a foundation, or prac
 
 This is not a glorious, production-grade IDE, I simply wrote this because I was bored.
 
-## Building
-This is a Qt6 cmake project, so install the following (below is for linux, your OS may differ):
+# Building from Source
+This is a Qt6 cmake project. Install the prerequisites and follow the build instructions below:
+## Prerequisites
+Install the following dependencies based on your OS. Be sure you have a C++17 compatible compiler (gcc, clang, msvc, etc.)
+### Linux
 ```
 sudo apt-get install cmake qtcreator build-essential libgl1-mesa-dev qt6-base-dev qt6-tools-dev-tools
 ```
 
+### MacOS
+```
+brew install cmake qt@6
+```
+
+### Windows
+Recommended to install the QtCreator on windows which will also install other dependencies for you: https://doc.qt.io/qtcreator/creator-how-to-install.html
+
+## Cloning and Building
 **IMPORTANT**: When cloning the repository, use the `--recursive` flag to include Tree-sitter submodules:
 ```bash
 git clone --recursive https://github.com/Kiyoshika/openIDE.git
