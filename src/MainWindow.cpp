@@ -76,10 +76,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&m_fileMenu, &openide::menu::FileMenu::projectOpened, this, &MainWindow::onProjectOpened);
     
     // Update Edit menu state when tabs change
-    connect(&m_codeTabPane, &QTabWidget::currentChanged, this, [this](int){
-        m_editMenu.updateFindActionState();
-    });
-    connect(&m_codeTabPane, &QTabWidget::tabBarClicked, this, [this](int){
+    connect(&m_codeTabPane, &openide::code::CodeTabPane::editMenuStateChanged, this, [this](){
         m_editMenu.updateFindActionState();
     });
     

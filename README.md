@@ -42,9 +42,7 @@ Below is a preview of the `0.1.0` build on `2025 December 26`
 ## Wishlist
 These are the features that I eventually want to implement (in no particular order)
 * Right-click context menus
-    * ProjectTree - new/rename/delete files/directories, collapse/collapse all, etc.
-    * CodeTabPane - close all/close all others, split vertical/horizontal
-    * CodeEditor - view definitions/implementation, refactor, etc.
+    * CodeEditor - view definitions/implementation, refactor, etc. (need LSP first)
 * Vim motions
 * Adding build/run configurations (and saving/exporting them)
 * Support for custom themes (+ importing/exporting themes)
