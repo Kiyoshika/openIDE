@@ -7,7 +7,6 @@ namespace openide { class AppSettings; }
 namespace openide::code { class FindReplaceDialog; }
 
 #include "FileType.hpp"
-#include "KeywordDictionary.hpp"
 #include "SyntaxHighlighter.hpp"
 
 #include <QPlainTextEdit>

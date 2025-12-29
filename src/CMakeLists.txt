@@ -26,7 +26,6 @@ qt_add_library(${OPENIDE_CORE} SHARED
     menu/NewFileDialog.cpp
     AppSettings.cpp
     FileType.cpp
-    KeywordDictionary.cpp
     ProjectTree.cpp
     MainWindow.cpp
     # Tree-sitter core C files
@@ -80,7 +79,7 @@ qt_add_library(${OPENIDE_CORE} SHARED
     ${CMAKE_SOURCE_DIR}/external/tree-sitter-yaml/src/parser.c
     ${CMAKE_SOURCE_DIR}/external/tree-sitter-yaml/src/scanner.c
     # Headers
-    ../include/MainWindow.hpp ../include/code/CodeEditor.hpp ../include/code/CodeTabPane.hpp ../include/code/FindReplaceDialog.hpp ../include/code/TreeSitterWrapper.hpp ../include/code/ColorScheme.hpp ../include/menu/FileMenu.hpp ../include/menu/EditMenu.hpp ../include/menu/ThemeMenu.hpp ../include/menu/SettingsMenu.hpp ../include/menu/SettingsDialog.hpp ../include/menu/NewProjectDialog.hpp ../include/menu/NewFileDialog.hpp ../include/AppSettings.hpp ../include/FileType.hpp ../include/KeywordDictionary.hpp ../include/ProjectTree.hpp ../include/code/SyntaxHighlighter.hpp
+    ../include/MainWindow.hpp ../include/code/CodeEditor.hpp ../include/code/CodeTabPane.hpp ../include/code/FindReplaceDialog.hpp ../include/code/TreeSitterWrapper.hpp ../include/code/ColorScheme.hpp ../include/menu/FileMenu.hpp ../include/menu/EditMenu.hpp ../include/menu/ThemeMenu.hpp ../include/menu/SettingsMenu.hpp ../include/menu/SettingsDialog.hpp ../include/menu/NewProjectDialog.hpp ../include/menu/NewFileDialog.hpp ../include/AppSettings.hpp ../include/FileType.hpp ../include/ProjectTree.hpp ../include/code/SyntaxHighlighter.hpp
 )
 
 # Remove the target_sources line as all sources are now in qt_add_library

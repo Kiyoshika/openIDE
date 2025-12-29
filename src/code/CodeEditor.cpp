@@ -69,6 +69,9 @@ CodeEditor::CodeEditor(MainWindow* parent, openide::AppSettings* settings)
     int luminance = (299 * bgColor.red() + 587 * bgColor.green() + 114 * bgColor.blue()) / 1000;
     m_isDarkTheme = (luminance < 128);
     
+    // Initialize syntax highlighter with detected theme
+    m_syntaxHighlighter.updateTheme(m_isDarkTheme);
+    
     highlightCurrentLine();
     
     // Add Ctrl+F shortcut for find and replace

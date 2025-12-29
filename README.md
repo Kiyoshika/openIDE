@@ -9,6 +9,16 @@ This is a Qt6 cmake project, so install the following (below is for linux, your 
 sudo apt-get install cmake qtcreator build-essential libgl1-mesa-dev qt6-base-dev qt6-tools-dev-tools
 ```
 
+**IMPORTANT**: When cloning the repository, use the `--recursive` flag to include Tree-sitter submodules:
+```bash
+git clone --recursive https://github.com/Kiyoshika/openIDE.git
+```
+
+If you've already cloned without `--recursive`, initialize the submodules:
+```bash
+git submodule update --init --recursive
+```
+
 ### Building with QtCreator
 If building with QtCreator, just `File > Open File or Project` and select the root `CMakeLists.txt`. Everything should configure automaticaly after importing. 
 
