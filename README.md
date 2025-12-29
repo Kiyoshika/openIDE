@@ -78,8 +78,6 @@ This release will focus entirely on language server support to be able to traver
   * Probably need to also specify a command on how to invoke/start the language server which is triggered when opening a file type corresponding to the given LSP
 * If LSP is configured when opening relevant file type, need to way to invoke the command, receive information, parse it and display relevant information on the code editor as well as supporting events to click on method names, view references, goto definitions, etc.
 
-There's a lot of complexity involved with this, so the entire v0.5.0 release will likely only be focused on language server support
-
 ### v0.6.0 Roadmap
 This release will focus entirely on debugging.
 * Add debuggers to the configurations introduced in `v0.4.0`
