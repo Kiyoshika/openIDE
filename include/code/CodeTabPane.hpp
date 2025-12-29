@@ -8,6 +8,7 @@
 
 // forward decl
 class MainWindow;
+namespace openide { class AppSettings; }
 
 namespace openide::code {
 class CodeTabPane : QTabWidget {
@@ -19,6 +20,7 @@ public:
   void saveAllActiveFiles();
   bool fileIsOpen(const QString& path) const;
   void updateAllEditorsTheme(bool isDarkTheme);
+  void updateAllEditorsSettings(openide::AppSettings* settings);
   ~CodeTabPane() = default;
 
 private:

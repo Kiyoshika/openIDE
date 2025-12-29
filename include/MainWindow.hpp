@@ -3,6 +3,8 @@
 
 #include "menu/FileMenu.hpp"
 #include "menu/ThemeMenu.hpp"
+#include "menu/SettingsMenu.hpp"
+#include "AppSettings.hpp"
 #include "ProjectTree.hpp"
 #include "code/CodeEditor.hpp"
 #include "code/CodeTabPane.hpp"
@@ -30,6 +32,8 @@ public:
     QWidget* getCentralWidget() const;
     QGridLayout* getLayout() const;
     void setComponentsVisible(bool isVisible);
+    openide::AppSettings* getAppSettings() { return &m_appSettings; }
+    openide::code::CodeTabPane* getCodeTabPane() { return &m_codeTabPane; }
     ~MainWindow();
 
 private:
@@ -40,6 +44,8 @@ private:
     openide::code::CodeTabPane m_codeTabPane;
     openide::menu::FileMenu m_fileMenu;
     openide::menu::ThemeMenu m_themeMenu;
+    openide::menu::SettingsMenu m_settingsMenu;
+    openide::AppSettings m_appSettings;
 };
 
 #endif // MAINWINDOW_HPP

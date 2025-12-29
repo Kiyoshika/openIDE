@@ -2,7 +2,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Widgets)
+find_package(Qt6 REQUIRED COMPONENTS Widgets Core)
 
 set(OPENIDE_CORE ${OPENIDE_CORE}core)
 
@@ -12,14 +12,17 @@ qt_add_library(${OPENIDE_CORE} SHARED
     code/SyntaxHighlighter.cpp
     menu/FileMenu.cpp
     menu/ThemeMenu.cpp
+    menu/SettingsMenu.cpp
+    menu/SettingsDialog.cpp
+    AppSettings.cpp
     FileType.cpp
     KeywordDictionary.cpp
     ProjectTree.cpp
     MainWindow.cpp
-    ../include/MainWindow.hpp ../include/code/CodeEditor.hpp ../include/code/CodeTabPane.hpp ../include/menu/FileMenu.hpp ../include/menu/ThemeMenu.hpp ../include/FileType.hpp ../include/KeywordDictionary.hpp ../include/MainWindow.hpp ../include/ProjectTree.hpp ../include/code/SyntaxHighlighter.hpp
+    ../include/MainWindow.hpp ../include/code/CodeEditor.hpp ../include/code/CodeTabPane.hpp ../include/menu/FileMenu.hpp ../include/menu/ThemeMenu.hpp ../include/menu/SettingsMenu.hpp ../include/menu/SettingsDialog.hpp ../include/AppSettings.hpp ../include/FileType.hpp ../include/KeywordDictionary.hpp ../include/ProjectTree.hpp ../include/code/SyntaxHighlighter.hpp
 )
 target_include_directories(${OPENIDE_CORE} PRIVATE ${CMAKE_SOURCE_DIR}/include)
-target_link_libraries(${OPENIDE_CORE} PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(${OPENIDE_CORE} PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Core)
 
 set(PROJECT_SOURCES
         main.cpp

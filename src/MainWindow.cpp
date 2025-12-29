@@ -2,6 +2,8 @@
 #include "ProjectTree.hpp"
 #include "code/CodeTabPane.hpp"
 #include "menu/ThemeMenu.hpp"
+#include "menu/SettingsMenu.hpp"
+#include "AppSettings.hpp"
 #include <QApplication>
 
 using namespace openide;
@@ -22,7 +24,11 @@ MainWindow::MainWindow(QWidget *parent)
          // saveAllFilesCallback
         [this](){m_codeTabPane.saveAllActiveFiles();})
     , m_themeMenu(this, this->menuBar())
+    , m_settingsMenu(this, this->menuBar(), &m_appSettings)
 {
+    // Load settings on startup
+    m_appSettings.loadFromFile();
+    
     QMainWindow::resize(1200, 800);
     setCentralWidget(m_centralWidget);
 
@@ -36,7 +42,7 @@ MainWindow::MainWindow(QWidget *parent)
     // double clicking file on project tree populates code editor
     // TODO: move this to the actual ProjectTree class ctor isntead of main window
     QObject::connect(m_projectTree.getTreeView(), &QTreeView::doubleClicked, this, [this](const QModelIndex& index){
-        m_projectTree.onClick(m_codeTabPane, index);
+        m_projectTree.onClick(m_codeTabPane, index, &m_appSettings);
     });
     
     // Connect theme changes to update all code editors
@@ -44,6 +50,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&m_themeMenu, &openide::menu::ThemeMenu::themeChanged, this, [this](openide::menu::Theme theme){
         bool isDark = (theme == openide::menu::Theme::Dark);
         m_codeTabPane.updateAllEditorsTheme(isDark);
+    });
+    
+    // Connect settings changes to update all code editors
+    connect(&m_settingsMenu, &openide::menu::SettingsMenu::settingsChanged, this, [this](){
+        m_codeTabPane.updateAllEditorsSettings(&m_appSettings);
     });
 }
 

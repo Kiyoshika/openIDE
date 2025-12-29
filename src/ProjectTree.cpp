@@ -2,6 +2,7 @@
 #include "MainWindow.hpp"
 #include "FileType.hpp"
 #include "code/CodeTabPane.hpp"
+#include "AppSettings.hpp"
 
 using namespace openide;
 using namespace openide::code;
@@ -59,7 +60,7 @@ void ProjectTree::loadTreeFromDir(const QString* dirPath)
     this->m_parent->setComponentsVisible(true);
 }
 
-void ProjectTree::onClick(CodeTabPane& codeTabPane, const QModelIndex& index)
+void ProjectTree::onClick(CodeTabPane& codeTabPane, const QModelIndex& index, openide::AppSettings* settings)
 {
     QFileSystemModel* model = qobject_cast<QFileSystemModel*>(this->m_treeView->model());
     if (!model) return;
@@ -89,7 +90,7 @@ void ProjectTree::onClick(CodeTabPane& codeTabPane, const QModelIndex& index)
     if (!codeTabPane.fileIsOpen(path))
     {
 
-        CodeEditor* newEditor = new CodeEditor(m_parent);
+        CodeEditor* newEditor = new CodeEditor(m_parent, settings);
         newEditor->loadFile(path, fileType);
         codeTabPane.addTab(newEditor, fileName);
     }

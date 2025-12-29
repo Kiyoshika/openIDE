@@ -1,5 +1,6 @@
 #include "code/CodeEditor.hpp"
 #include "MainWindow.hpp"
+#include "AppSettings.hpp"
 #include <QPainter>
 #include <QTextBlock>
 #include <QResizeEvent>
@@ -9,7 +10,7 @@
 
 using namespace openide::code;
 
-CodeEditor::CodeEditor(MainWindow* parent)
+CodeEditor::CodeEditor(MainWindow* parent, openide::AppSettings* settings)
     : QPlainTextEdit(parent ? parent->getCentralWidget() : parent)
     , m_syntaxHighlighter{this->document()}
     , m_isModified{false}
@@ -18,16 +19,16 @@ CodeEditor::CodeEditor(MainWindow* parent)
 {
     if (!parent) return;
 
-    // TODO: add a settings menu to change these, but these are defaults
-
-    // font
-    QFont font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
-    font.setPointSize(11);
-    setFont(font);
-
-    // tab space
-    // TODO: ideally this would be inferred from the file or fallback to a default setting
-    setTabStopDistance(QFontMetricsF(font).horizontalAdvance(' ') * 4);
+    // Apply settings if provided, otherwise use defaults
+    if (settings) {
+        applySettings(settings);
+    } else {
+        // Fallback to defaults if no settings provided
+        QFont font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+        font.setPointSize(12);
+        setFont(font);
+        setTabStopDistance(QFontMetricsF(font).horizontalAdvance(' ') * 4);
+    }
 
     // behavior
     setLineWrapMode(QPlainTextEdit::NoWrap);
@@ -222,5 +223,19 @@ void CodeEditor::updateTheme(bool isDarkTheme)
     highlightCurrentLine();
     if (m_lineNumberArea) {
         m_lineNumberArea->update();
+    }
+}
+
+void CodeEditor::applySettings(openide::AppSettings* settings)
+{
+    if (!settings) return;
+    
+    QFont font = settings->font();
+    setFont(font);
+    setTabStopDistance(QFontMetricsF(font).horizontalAdvance(' ') * settings->tabSpace());
+    
+    // Update line number area if it exists
+    if (m_lineNumberArea) {
+        updateLineNumberAreaWidth(0);
     }
 }

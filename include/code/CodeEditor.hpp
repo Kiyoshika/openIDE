@@ -3,6 +3,7 @@
 
 // forward decl
 class MainWindow;
+namespace openide { class AppSettings; }
 
 #include "FileType.hpp"
 #include "KeywordDictionary.hpp"
@@ -28,8 +29,9 @@ class CodeEditor : public QPlainTextEdit
     Q_OBJECT
     friend class LineNumberArea;
 public:
-    CodeEditor(MainWindow* parent = nullptr);
+    CodeEditor(MainWindow* parent = nullptr, openide::AppSettings* settings = nullptr);
     void setComponentVisible(bool isVisible);
+    void applySettings(openide::AppSettings* settings);
     void attachDirtyTabCallback(std::function<void()> callback);
     const QString& getFilePath() const;
     void loadFile(const QString& path, enum FileType fileType);

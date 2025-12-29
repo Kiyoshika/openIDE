@@ -1,6 +1,7 @@
 #include "code/CodeTabPane.hpp"
 #include "code/CodeEditor.hpp"
 #include "MainWindow.hpp"
+#include "AppSettings.hpp"
 
 using namespace openide::code;
 
@@ -127,6 +128,17 @@ void CodeTabPane::updateAllEditorsTheme(bool isDarkTheme)
         CodeEditor* editor = qobject_cast<CodeEditor*>(QTabWidget::widget(i));
         if (editor) {
             editor->updateTheme(isDarkTheme);
+        }
+    }
+}
+
+void CodeTabPane::updateAllEditorsSettings(openide::AppSettings* settings)
+{
+    for (int i = 0; i < QTabWidget::count(); ++i)
+    {
+        CodeEditor* editor = qobject_cast<CodeEditor*>(QTabWidget::widget(i));
+        if (editor) {
+            editor->applySettings(settings);
         }
     }
 }
