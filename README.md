@@ -35,9 +35,9 @@ Check out the github [releases](https://github.com/Kiyoshika/openIDE/tags) for s
 **WARNING**: The `main` branch may be unstable as it is the active development/experimental branch. Stick to releases for the "stable"-ish builds.
 
 ## Preview 
-Below is a preview of the `0.1.0` build on `2025 December 26`
+Below is a preview of the `0.3.0` build on `2025 December 28` (dark theme)
 
-<img width="812" height="632" alt="image" src="https://github.com/user-attachments/assets/8a88f855-b5f5-4a40-941d-53da80290aaf" />
+<img width="1539" height="884" alt="image" src="https://github.com/user-attachments/assets/5677f477-9568-49d5-a6bc-159b55e5225a" />
 
 ## Wishlist
 These are the features that I eventually want to implement (in no particular order)
@@ -47,11 +47,9 @@ These are the features that I eventually want to implement (in no particular ord
 * Adding build/run configurations (and saving/exporting them)
 * Support for custom themes (+ importing/exporting themes)
 * Adjust scale of UI somehow (configurable in settings)
-* Split code views vertically/horizontally
 * File diffing
 * Git integration
 * Code traversal (goto definition/implementation, etc.)
-* Overhaul of the styling to make it actually look bearable on the eyes
 * Support for language server protocols, error highlighting/syntax checking, etc.
 * Setting up breakpoints and debugging
 
