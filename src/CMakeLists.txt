@@ -10,7 +10,9 @@ qt_add_library(${OPENIDE_CORE} SHARED
     code/CodeEditor.cpp
     code/CodeTabPane.cpp
     code/SyntaxHighlighter.cpp
+    code/FindReplaceDialog.cpp
     menu/FileMenu.cpp
+    menu/EditMenu.cpp
     menu/ThemeMenu.cpp
     menu/SettingsMenu.cpp
     menu/SettingsDialog.cpp
@@ -21,7 +23,7 @@ qt_add_library(${OPENIDE_CORE} SHARED
     KeywordDictionary.cpp
     ProjectTree.cpp
     MainWindow.cpp
-    ../include/MainWindow.hpp ../include/code/CodeEditor.hpp ../include/code/CodeTabPane.hpp ../include/menu/FileMenu.hpp ../include/menu/ThemeMenu.hpp ../include/menu/SettingsMenu.hpp ../include/menu/SettingsDialog.hpp ../include/menu/NewProjectDialog.hpp ../include/menu/NewFileDialog.hpp ../include/AppSettings.hpp ../include/FileType.hpp ../include/KeywordDictionary.hpp ../include/ProjectTree.hpp ../include/code/SyntaxHighlighter.hpp
+    ../include/MainWindow.hpp ../include/code/CodeEditor.hpp ../include/code/CodeTabPane.hpp ../include/code/FindReplaceDialog.hpp ../include/menu/FileMenu.hpp ../include/menu/EditMenu.hpp ../include/menu/ThemeMenu.hpp ../include/menu/SettingsMenu.hpp ../include/menu/SettingsDialog.hpp ../include/menu/NewProjectDialog.hpp ../include/menu/NewFileDialog.hpp ../include/AppSettings.hpp ../include/FileType.hpp ../include/KeywordDictionary.hpp ../include/ProjectTree.hpp ../include/code/SyntaxHighlighter.hpp
 )
 target_include_directories(${OPENIDE_CORE} PRIVATE ${CMAKE_SOURCE_DIR}/include)
 target_link_libraries(${OPENIDE_CORE} PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Core)

@@ -11,7 +11,8 @@ class MainWindow;
 namespace openide { class AppSettings; }
 
 namespace openide::code {
-class CodeTabPane : QTabWidget {
+class CodeTabPane : public QTabWidget {
+  Q_OBJECT
 public:
   CodeTabPane(MainWindow *parent);
   void addTab(CodeEditor *editor, const QString &tabName);

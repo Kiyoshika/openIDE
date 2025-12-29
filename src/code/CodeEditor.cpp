@@ -1,4 +1,5 @@
 #include "code/CodeEditor.hpp"
+#include "code/FindReplaceDialog.hpp"
 #include "MainWindow.hpp"
 #include "AppSettings.hpp"
 #include <QPainter>
@@ -7,15 +8,19 @@
 #include <QScrollBar>
 #include <QFontDatabase>
 #include <QApplication>
+#include <QShortcut>
+#include <QKeySequence>
 
 using namespace openide::code;
 
 CodeEditor::CodeEditor(MainWindow* parent, openide::AppSettings* settings)
     : QPlainTextEdit(parent ? parent->getCentralWidget() : parent)
+    , m_parent{parent}
     , m_syntaxHighlighter{this->document()}
     , m_isModified{false}
     , m_lineNumberArea{nullptr}
     , m_isDarkTheme{false}
+    , m_findReplaceDialog{nullptr}
 {
     if (!parent) return;
 
@@ -65,6 +70,18 @@ CodeEditor::CodeEditor(MainWindow* parent, openide::AppSettings* settings)
     m_isDarkTheme = (luminance < 128);
     
     highlightCurrentLine();
+    
+    // Add Ctrl+F shortcut for find and replace
+    QShortcut* findShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_F), this);
+    connect(findShortcut, &QShortcut::activated, this, &CodeEditor::showFindReplaceDialog);
+}
+
+CodeEditor::~CodeEditor()
+{
+    if (m_findReplaceDialog) {
+        delete m_findReplaceDialog;
+        m_findReplaceDialog = nullptr;
+    }
 }
 
 void CodeEditor::setModified(bool isModified)
@@ -241,4 +258,14 @@ void CodeEditor::applySettings(openide::AppSettings* settings)
     if (m_lineNumberArea) {
         updateLineNumberAreaWidth(0);
     }
+}
+
+void CodeEditor::showFindReplaceDialog()
+{
+    if (!m_findReplaceDialog) {
+        m_findReplaceDialog = new FindReplaceDialog(this, m_parent);
+    }
+    m_findReplaceDialog->show();
+    m_findReplaceDialog->raise();
+    m_findReplaceDialog->activateWindow();
 }

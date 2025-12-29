@@ -2,6 +2,7 @@
 #define MAINWINDOW_HPP
 
 #include "menu/FileMenu.hpp"
+#include "menu/EditMenu.hpp"
 #include "menu/ThemeMenu.hpp"
 #include "menu/SettingsMenu.hpp"
 #include "AppSettings.hpp"
@@ -48,6 +49,7 @@ private:
     openide::ProjectTree m_projectTree;
     openide::code::CodeTabPane m_codeTabPane;
     openide::menu::FileMenu m_fileMenu;
+    openide::menu::EditMenu m_editMenu;
     openide::menu::ThemeMenu m_themeMenu;
     openide::menu::SettingsMenu m_settingsMenu;
     openide::AppSettings m_appSettings;

@@ -4,6 +4,7 @@
 // forward decl
 class MainWindow;
 namespace openide { class AppSettings; }
+namespace openide::code { class FindReplaceDialog; }
 
 #include "FileType.hpp"
 #include "KeywordDictionary.hpp"
@@ -38,7 +39,8 @@ public:
     void setModified(bool isModified);
     bool isModified() const;
     void updateTheme(bool isDarkTheme);
-    ~CodeEditor() = default;
+    void showFindReplaceDialog();
+    ~CodeEditor();
     
 signals:
     void fileModified();
@@ -58,6 +60,7 @@ private:
     QString m_filePath;
     openide::SyntaxHighlighter m_syntaxHighlighter;
     LineNumberArea* m_lineNumberArea;
+    FindReplaceDialog* m_findReplaceDialog;
 };
 
 class LineNumberArea : public QWidget

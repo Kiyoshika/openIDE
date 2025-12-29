@@ -19,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent)
     , m_projectTree(this)
     , m_codeTabPane(this)
     , m_fileMenu(this, this->menuBar(), &m_projectTree, &m_codeTabPane)
+    , m_editMenu(this, this->menuBar(), &m_codeTabPane)
     , m_themeMenu(this, this->menuBar())
     , m_settingsMenu(this, this->menuBar(), &m_appSettings)
 {
@@ -54,6 +55,14 @@ MainWindow::MainWindow(QWidget *parent)
     
     // Connect project opened signal to update title
     connect(&m_fileMenu, &openide::menu::FileMenu::projectOpened, this, &MainWindow::onProjectOpened);
+    
+    // Update Edit menu state when tabs change
+    connect(&m_codeTabPane, &QTabWidget::currentChanged, this, [this](int){
+        m_editMenu.updateFindActionState();
+    });
+    connect(&m_codeTabPane, &QTabWidget::tabBarClicked, this, [this](int){
+        m_editMenu.updateFindActionState();
+    });
     
     // Now that all connections are set up, apply the initial theme
     m_themeMenu.applyTheme(openide::menu::ThemeMenu::Theme::System);

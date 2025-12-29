@@ -62,6 +62,9 @@ void CodeTabPane::addTab(CodeEditor* editor, const QString& tabName)
     });
     
     setCurrentWidget(editor);
+    
+    // Emit signal to update menu states
+    emit currentChanged(currentIndex());
 }
 
 void CodeTabPane::setComponentVisible(bool isVisible)

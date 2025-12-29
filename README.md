@@ -38,7 +38,6 @@ These are the features that I eventually want to implement (in no particular ord
 * Vim motions
 * Tree sitter for actual proper syntax highlighting (currently using regex as a placeholder)
 * Adding build/run configurations (and saving/exporting them)
-* Find/replace
 * Highlight-tabbing (select a portion of text and press tab - should tab everything)
 * Smart indenting (e.g., pressing enter and having the next line tab up correctly)
 * Proper keyword dictionaries for common languages (what I have now is just a placeholder to see some highlighting)
