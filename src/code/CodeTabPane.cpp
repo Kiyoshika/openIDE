@@ -116,6 +116,26 @@ void CodeTabPane::setupTabWidget(QTabWidget* tabWidget)
     });
 }
 
+void CodeTabPane::connectEditorSignals(CodeEditor* editor, QTabWidget* tabWidget)
+{
+    if (!editor || !tabWidget) return;
+    
+    // Connect fileModified signal to mark the tab as dirty
+    connect(editor, &CodeEditor::fileModified, this, [this, editor, tabWidget]() {
+        // Find the tab index for this editor
+        for (int i = 0; i < tabWidget->count(); ++i) {
+            if (tabWidget->widget(i) == editor) {
+                QString tabText = tabWidget->tabText(i);
+                // Only add asterisk if not already present
+                if (!tabText.endsWith(" *")) {
+                    tabWidget->setTabText(i, tabText + " *");
+                }
+                break;
+            }
+        }
+    });
+}
+
 PaneContainer* CodeTabPane::findContainerForTabWidget(QTabWidget* tabWidget)
 {
     return m_root ? m_root->findContainerWithTabWidget(tabWidget) : nullptr;
@@ -189,6 +209,9 @@ void CodeTabPane::addTab(CodeEditor *editor, const QString &tabName)
         
         // Install event filter on the editor to track focus
         editor->installEventFilter(this);
+        
+        // Connect editor signals to update tab state
+        connectEditorSignals(editor, targetWidget);
     }
 }
 
@@ -528,6 +551,7 @@ void CodeTabPane::moveTabToPane(QTabWidget* sourcePane, int tabIndex, QTabWidget
     // Get tab data
     QWidget* widget = sourcePane->widget(tabIndex);
     QString tabText = sourcePane->tabText(tabIndex);
+    CodeEditor* editor = qobject_cast<CodeEditor*>(widget);
     
     // Remove from source (doesn't delete the widget)
     sourcePane->removeTab(tabIndex);
@@ -536,6 +560,11 @@ void CodeTabPane::moveTabToPane(QTabWidget* sourcePane, int tabIndex, QTabWidget
     int newIndex = targetPane->addTab(widget, tabText);
     targetPane->setCurrentIndex(newIndex);
     m_activeTabWidget = targetPane;
+    
+    // Reconnect signals for the moved editor
+    if (editor) {
+        connectEditorSignals(editor, targetPane);
+    }
     
     // Check if source pane is now empty and simplify if needed
     if (sourcePane->count() == 0) {
@@ -578,8 +607,12 @@ void CodeTabPane::splitHorizontal(QTabWidget* pane, int tabIndex)
     // Duplicate the editor to the right child
     CodeEditor* newEditor = duplicateEditor(sourceEditor);
     if (newEditor && container->rightChild() && container->rightChild()->tabWidget()) {
+        QTabWidget* rightTabWidget = container->rightChild()->tabWidget();
         container->rightChild()->addTab(newEditor, sourceEditor->getFilePath());
-        m_activeTabWidget = container->rightChild()->tabWidget();
+        m_activeTabWidget = rightTabWidget;
+        
+        // Connect signals for the new editor
+        connectEditorSignals(newEditor, rightTabWidget);
     }
     
     // Update pane numbers after splitting
@@ -612,8 +645,12 @@ void CodeTabPane::splitVertical(QTabWidget* pane, int tabIndex)
     // Duplicate the editor to the right child
     CodeEditor* newEditor = duplicateEditor(sourceEditor);
     if (newEditor && container->rightChild() && container->rightChild()->tabWidget()) {
+        QTabWidget* rightTabWidget = container->rightChild()->tabWidget();
         container->rightChild()->addTab(newEditor, sourceEditor->getFilePath());
-        m_activeTabWidget = container->rightChild()->tabWidget();
+        m_activeTabWidget = rightTabWidget;
+        
+        // Connect signals for the new editor
+        connectEditorSignals(newEditor, rightTabWidget);
     }
     
     // Update pane numbers after splitting
@@ -696,6 +733,7 @@ void CodeTabPane::dropEvent(QDropEvent* event)
         // Get tab data before removing
         QWidget* widget = m_dragSourcePane->widget(m_dragSourceIndex);
         QString tabText = m_dragSourcePane->tabText(m_dragSourceIndex);
+        CodeEditor* editor = qobject_cast<CodeEditor*>(widget);
         
         // Remove from source (this doesn't delete the widget)
         m_dragSourcePane->removeTab(m_dragSourceIndex);
@@ -704,6 +742,11 @@ void CodeTabPane::dropEvent(QDropEvent* event)
         int newIndex = targetPane->addTab(widget, tabText);
         targetPane->setCurrentIndex(newIndex);
         m_activeTabWidget = targetPane;
+        
+        // Reconnect signals for the moved editor
+        if (editor) {
+            connectEditorSignals(editor, targetPane);
+        }
         
         // Check if source pane is now empty and simplify if needed
         if (m_dragSourcePane->count() == 0) {
@@ -741,6 +784,9 @@ void CodeTabPane::saveActiveFile()
     if (editor) {
         editor->saveFile();
         
+        // Reset the modified state so future changes will trigger the dirty indicator
+        editor->setModified(false);
+        
         // Remove asterisk from tab name
         QString tabText = active->tabText(currentIdx);
         if (tabText.endsWith(" *")) {
@@ -761,6 +807,9 @@ void CodeTabPane::saveAllActiveFiles()
             CodeEditor* editor = qobject_cast<CodeEditor*>(tw->widget(i));
             if (editor) {
                 editor->saveFile();
+                
+                // Reset the modified state so future changes will trigger the dirty indicator
+                editor->setModified(false);
                 
                 // Remove asterisk from tab name
                 QString tabText = tw->tabText(i);

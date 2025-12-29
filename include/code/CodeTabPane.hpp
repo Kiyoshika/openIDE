@@ -63,6 +63,7 @@ private:
   void splitVertical(QTabWidget* pane, int tabIndex);
   void moveTabToPane(QTabWidget* sourcePane, int tabIndex, QTabWidget* targetPane);
   void setupTabWidget(QTabWidget* tabWidget);
+  void connectEditorSignals(CodeEditor* editor, QTabWidget* tabWidget);
   CodeEditor* duplicateEditor(CodeEditor* source);
   PaneContainer* findContainerForTabWidget(QTabWidget* tabWidget);
   QTabWidget* getActiveTabWidget();
