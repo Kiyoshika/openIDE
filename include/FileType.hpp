@@ -12,6 +12,23 @@ enum class FileType
     CPP,
     JAVA,
     PYTHON,
+    JAVASCRIPT,
+    TYPESCRIPT,
+    GO,
+    RUST,
+    CSHARP,
+    RUBY,
+    PHP,
+    SWIFT,
+    KOTLIN,
+    HTML,
+    CSS,
+    SQL,
+    SHELL,
+    MARKDOWN,
+    JSON,
+    XML,
+    YAML,
     UNKNOWN
 };
 
