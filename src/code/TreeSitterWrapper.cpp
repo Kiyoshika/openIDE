@@ -1,5 +1,10 @@
 #include "code/TreeSitterWrapper.hpp"
 #include <tree_sitter/api.h>
+#include <QFile>
+#include <QDir>
+#include <QCoreApplication>
+#include <QHash>
+#include <QDebug>
 
 // Declare external language functions from tree-sitter parsers
 extern "C" {
@@ -90,123 +95,85 @@ bool TreeSitterWrapper::isLanguageSupported(FileType fileType) const
 
 const char* TreeSitterWrapper::getQueryPatterns(FileType fileType) const
 {
-    switch (fileType)
-    {
-        case FileType::C:
-        case FileType::CPP:
-            return 
-                "(comment) @comment\n"
-                "(string_literal) @string\n"
-                "(number_literal) @number\n"
-                "(primitive_type) @keyword\n"
-                "(type_identifier) @type\n"
-                "(namespace_identifier) @type\n"
-                "(field_identifier) @property";
+    // Map file types to their highlight query file paths
+    static QHash<FileType, QString> queryFiles;
+    static QHash<FileType, QByteArray> cachedQueries;
+    
+    if (queryFiles.isEmpty()) {
+        // Get the source directory by going up from build directory
+        // Build structure: build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/src/
+        // We need to go up 3 levels to reach the project root
+        QString appDir = QCoreApplication::applicationDirPath();
+        QDir dir(appDir);
+        dir.cdUp(); // Go to build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug
+        dir.cdUp(); // Go to build/
+        dir.cdUp(); // Go to project root
+        QString baseDir = dir.absolutePath() + "/external/";
         
-        case FileType::PYTHON:
-            return 
-                "(comment) @comment\n"
-                "(string) @string\n"
-                "(integer) @number\n"
-                "(float) @number";
-        
-        case FileType::JAVA:
-            return 
-                "(comment) @comment\n"
-                "(string_literal) @string\n"
-                "(decimal_integer_literal) @number\n"
-                "(type_identifier) @type";
-        
-        case FileType::JAVASCRIPT:
-        case FileType::TYPESCRIPT:
-            return 
-                "(comment) @comment\n"
-                "(string) @string\n"
-                "(number) @number";
-        
-        case FileType::GO:
-            return 
-                "(comment) @comment\n"
-                "(interpreted_string_literal) @string\n"
-                "(int_literal) @number\n"
-                "(type_identifier) @type";
-        
-        case FileType::RUST:
-        case FileType::CSHARP:
-        case FileType::RUBY:
-        case FileType::PHP:
-        case FileType::SWIFT:
-        case FileType::KOTLIN:
-            // Simplified patterns - to be enhanced
-            return R"(
-                (comment) @comment
-                (string_literal) @string
-                (string) @string
-                (integer_literal) @number
-            )";
-        
-        case FileType::HTML:
-            return R"(
-                (tag_name) @keyword
-                (attribute_name) @property
-                (comment) @comment
-                (quoted_attribute_value) @string
-                (text) @variable
-            )";
-        
-        case FileType::CSS:
-            return R"(
-                (property_name) @property
-                (tag_name) @keyword
-                (class_name) @class
-                (id_name) @type
-                (comment) @comment
-                (string_value) @string
-                (integer_value) @number
-                (float_value) @number
-                (color_value) @number
-            )";
-        
-        case FileType::SQL:
-            return R"(
-                (keyword) @keyword
-                (comment) @comment
-                (string) @string
-                (number) @number
-                (identifier) @variable
-            )";
-        
-        case FileType::SHELL:
-            return R"(
-                (comment) @comment
-                (string) @string
-                (raw_string) @string
-            )";
-        case FileType::JSON:
-            return R"(
-                (string) @string
-                (number) @number
-                (true) @keyword
-                (false) @keyword
-                (null) @keyword
-                (pair key: (string) @property)
-            )";
-        
-        case FileType::YAML:
-            return R"(
-                (block_mapping_pair key: (flow_node) @property)
-                (flow_mapping key: (flow_node) @property)
-                (string) @string
-                (integer) @number
-                (float) @number
-                (boolean) @keyword
-                (null) @keyword
-                (comment) @comment
-            )";
-        
-        default:
-            return "";
+        queryFiles[FileType::C] = baseDir + "tree-sitter-c/queries/highlights.scm";
+        queryFiles[FileType::CPP] = baseDir + "tree-sitter-cpp/queries/highlights.scm";
+        queryFiles[FileType::PYTHON] = baseDir + "tree-sitter-python/queries/highlights.scm";
+        queryFiles[FileType::JAVA] = baseDir + "tree-sitter-java/queries/highlights.scm";
+        queryFiles[FileType::JAVASCRIPT] = baseDir + "tree-sitter-javascript/queries/highlights.scm";
+        queryFiles[FileType::TYPESCRIPT] = baseDir + "tree-sitter-typescript/queries/highlights.scm";
+        queryFiles[FileType::GO] = baseDir + "tree-sitter-go/queries/highlights.scm";
+        queryFiles[FileType::RUST] = baseDir + "tree-sitter-rust/queries/highlights.scm";
+        queryFiles[FileType::CSHARP] = baseDir + "tree-sitter-c-sharp/queries/highlights.scm";
+        queryFiles[FileType::RUBY] = baseDir + "tree-sitter-ruby/queries/highlights.scm";
+        queryFiles[FileType::PHP] = baseDir + "tree-sitter-php/queries/highlights.scm";
+        queryFiles[FileType::SWIFT] = baseDir + "tree-sitter-swift/queries/highlights.scm";
+        queryFiles[FileType::KOTLIN] = baseDir + "tree-sitter-kotlin/queries/highlights.scm";
+        queryFiles[FileType::HTML] = baseDir + "tree-sitter-html/queries/highlights.scm";
+        queryFiles[FileType::CSS] = baseDir + "tree-sitter-css/queries/highlights.scm";
+        queryFiles[FileType::SHELL] = baseDir + "tree-sitter-bash/queries/highlights.scm";
+        queryFiles[FileType::MARKDOWN] = baseDir + "tree-sitter-markdown/tree-sitter-markdown/queries/highlights.scm";
+        queryFiles[FileType::JSON] = baseDir + "tree-sitter-json/queries/highlights.scm";
+        queryFiles[FileType::XML] = baseDir + "tree-sitter-xml/queries/highlights.scm";
+        queryFiles[FileType::YAML] = baseDir + "tree-sitter-yaml/queries/highlights.scm";
     }
+    
+    // Check if we have a cached query for this file type
+    if (cachedQueries.contains(fileType)) {
+        return cachedQueries[fileType].constData();
+    }
+    
+    // Try to load the query file
+    QString filePath = queryFiles.value(fileType, "");
+    if (!filePath.isEmpty()) {
+        QFile file(filePath);
+        if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            QByteArray content = file.readAll();
+            file.close();
+            
+            // Append additional queries for specific languages to augment the official .scm
+            if (fileType == FileType::CPP || fileType == FileType::C) {
+                // Add essential missing patterns from C/C++ that aren't in the .scm
+                content.append("\n; Additional essential patterns\n");
+                content.append("(string_literal) @string\n");
+                content.append("(system_lib_string) @string\n");
+                content.append("(char_literal) @string\n");
+                content.append("(number_literal) @number\n");
+                content.append("(comment) @comment\n");
+                content.append("(true) @constant\n");
+                content.append("(false) @constant\n");
+                content.append("(type_identifier) @type\n");
+                content.append("(primitive_type) @type\n");
+                content.append("(sized_type_specifier) @type\n");
+                content.append("(call_expression function: (identifier) @function)\n");
+            }
+            
+            cachedQueries[fileType] = content;
+            qDebug() << "Loaded query file:" << filePath << "Size:" << content.size();
+            return cachedQueries[fileType].constData();
+        } else {
+            qDebug() << "Failed to open query file:" << filePath;
+        }
+    } else {
+        qDebug() << "No query file mapped for file type:" << static_cast<int>(fileType);
+    }
+    
+    // Fallback to empty query if file not found
+    return "";
 }
 
 QVector<HighlightInfo> TreeSitterWrapper::parseAndHighlight(const QString& text, FileType fileType)
