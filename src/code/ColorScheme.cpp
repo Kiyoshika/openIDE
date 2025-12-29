@@ -174,3 +174,4 @@ void ColorScheme::initializeDarkTheme()
     m_formats[HighlightType::Punctuation] = punctuationFormat;
 }
 
+

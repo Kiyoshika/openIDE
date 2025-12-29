@@ -199,3 +199,4 @@ void FindReplaceDialog::onReplaceAll()
     }
 }
 
+

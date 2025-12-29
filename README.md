@@ -5,8 +5,6 @@ This is not a glorious, production-grade IDE, I simply wrote this because I was 
 
 ### Known Issues
 Some known issues that should get addressed:
-* (`v0.3.0`) Code tabs no longer indicate if a file has been changed (i.e., the ` *` appended) - this is a regression introduced after completely refactoring the `CodeTabPane` to implement pane splitting
-* (`v0.3.0`) Syntax highlighting does not work on MacOS
 * (`v0.1.0+`) File tree on MacOS is sorted ascending regardless of directory/file (directories should always show first)
   * This may just be a limitation with QTreeView on MacOS, but maybe can find some workarounds
 
@@ -75,6 +73,7 @@ These are the features that I eventually want to implement (in no particular ord
 * Live file reads - as of now, if a change to a file is made externally, it must be closed and re-opened. But, like other editors, I'd like to have a live view of the file to reflect external changes immediately (need some thought on how to do this properly and handling conflicts such as editing a file while a change happened externally) - we can also potentially poll for file metadata and checking if it has been updated since we've opened it and display a message if we want to load the changes (if the file has unsaved changes) or if the file is clean, automatically read the external changes]
 * Code formatting
 * Code folding/unfolding (fold/unfold current method or all methods in file, etc.)
+* Write an installer to package things up (e.g., we are reading scm files for tree sitter which right now just traverses up some directories where the executable is - this won't work for a "real" distributable unless we manage where these external dependencies are in a predictable way. Also provide the option to install external tools for the user)
 
 ## Roadmap
 Below is the rough roadmap for the next release(s) targeting major features I want to accomplish

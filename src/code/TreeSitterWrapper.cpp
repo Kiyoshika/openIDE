@@ -100,14 +100,34 @@ const char* TreeSitterWrapper::getQueryPatterns(FileType fileType) const
     static QHash<FileType, QByteArray> cachedQueries;
     
     if (queryFiles.isEmpty()) {
-        // Get the source directory by going up from build directory
-        // Build structure: build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/src/
-        // We need to go up 3 levels to reach the project root
+        // Traverse up the directory tree to find the "openIDE" project root
         QString appDir = QCoreApplication::applicationDirPath();
         QDir dir(appDir);
-        dir.cdUp(); // Go to build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug
-        dir.cdUp(); // Go to build/
-        dir.cdUp(); // Go to project root
+        
+        // Keep going up until we find "openIDE" directory or reach the root
+        bool foundProjectRoot = false;
+        int maxAttempts = 20; // Safety limit to prevent infinite loop
+        int attempts = 0;
+        
+        while (attempts < maxAttempts) {
+            if (dir.dirName().toLower() == "openide") {
+                foundProjectRoot = true;
+                qDebug() << "Found openIDE project root at:" << dir.absolutePath();
+                break;
+            }
+            
+            if (!dir.cdUp()) {
+                // Reached root without finding openIDE
+                qDebug() << "Could not find openIDE directory, reached filesystem root";
+                break;
+            }
+            attempts++;
+        }
+        
+        if (!foundProjectRoot) {
+            qDebug() << "Warning: Could not locate openIDE project root directory";
+        }
+        
         QString baseDir = dir.absolutePath() + "/external/";
         
         queryFiles[FileType::C] = baseDir + "tree-sitter-c/queries/highlights.scm";
