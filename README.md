@@ -23,10 +23,6 @@ brew install cmake qt@6
 ```
 
 ### Windows
-Install the latest Windows SDK (on or after build 1809 around October 2018) which is required for ConPTY which serves as the terminal backend for the integrated terminal: https://learn.microsoft.com/en-us/windows/apps/windows-sdk/downloads
-
-At the moment, the integrated terminal is not supported on Windows builds prior to build 1809 (October 2018) until an implementation is done for backwards compatibility.
-
 Recommended to install the QtCreator on windows which will also install other dependencies for you: https://doc.qt.io/qtcreator/creator-how-to-install.html
 
 ## Cloning and Building
