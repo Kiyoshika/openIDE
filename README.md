@@ -5,6 +5,8 @@ This is not a glorious, production-grade IDE, I simply wrote this because I was 
 
 ### Known Issues
 Some known issues that should get addressed:
+* (`v0.3.0+`) Application crashes when splitting a file and editing the original instance (modifying dangling pointer)
+  * This is already fixed in the upcoming `v0.4.0` release
 * (`v0.1.0+`) File tree on MacOS is sorted ascending regardless of directory/file (directories should always show first)
   * This may just be a limitation with QTreeView on MacOS, but maybe can find some workarounds
 
@@ -286,3 +288,4 @@ apply, that proxy's public statement of acceptance of any version is
 permanent authorization for you to choose that version for the
 Library.
 ```
+
