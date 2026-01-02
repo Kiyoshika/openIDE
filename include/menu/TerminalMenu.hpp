@@ -19,6 +19,7 @@ class TerminalMenu : public QMenu
 private slots:
 	void onNewTerminalTriggered();
 private:
+    MainWindow* m_parent;
 };
 }
 #endif // TERMINALMENU_HPP

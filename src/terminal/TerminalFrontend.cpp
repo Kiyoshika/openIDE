@@ -1,4 +1,6 @@
 #include "terminal/TerminalFrontend.hpp"
 #include "MainWindow.hpp"
 
-TerminalFrontend::TerminalFrontend() {}
+using namespace openide::terminal;
+
+TerminalFrontend::TerminalFrontend(MainWindow* parent) : QAbstractScrollArea(parent->getCentralWidget()) {}

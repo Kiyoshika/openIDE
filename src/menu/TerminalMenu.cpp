@@ -1,10 +1,12 @@
 #include "menu/TerminalMenu.hpp"
+#include "terminal/TerminalFrontend.hpp"
 #include "MainWindow.hpp"
 
 using namespace openide;
 using namespace openide::menu;
+using namespace openide::terminal;
 
-TerminalMenu::TerminalMenu(MainWindow* parent, QMenuBar* menuBar)
+TerminalMenu::TerminalMenu(MainWindow* parent, QMenuBar* menuBar) : m_parent(parent)
 {
 	if (!parent) return;
     
@@ -18,5 +20,8 @@ TerminalMenu::TerminalMenu(MainWindow* parent, QMenuBar* menuBar)
 
 void TerminalMenu::onNewTerminalTriggered()
 {
-	// TODO: implement this
+    if (!m_parent) return;
+    TerminalFrontend& terminalFrontend = m_parent->getTerminalFrontend();
+    terminalFrontend.setVisible(true);
+    // TODO: initialize the actual terminal; terminalFrontend.init() or something
 }

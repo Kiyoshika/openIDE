@@ -7,6 +7,7 @@
 #include <QApplication>
 
 using namespace openide;
+using namespace openide::terminal;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -23,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent)
     , m_themeMenu(this, this->menuBar())
     , m_settingsMenu(this, this->menuBar(), &m_appSettings)
     , m_terminalMenu(this, this->menuBar())
+    , m_terminalFrontend(this)
 {
     // Load settings on startup
     m_appSettings.loadFromFile();
@@ -42,10 +44,13 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Vertical splitter for the CodeTabPane and TerminalFrontend
     m_verticalSplitter->addWidget(&m_codeTabPane);
-    //m_verticalSplitter->addWidget(&m_terminalFrontend);
-    m_verticalSplitter->setSizes({800, 0}); // terminal is 0 by default
+    m_verticalSplitter->addWidget(&m_terminalFrontend);
+    m_verticalSplitter->setSizes({550, 250});
     m_verticalSplitter->setOpaqueResize(false);
     m_verticalSplitter->setHandleWidth(3);
+    
+    // Hide terminal by default
+    m_terminalFrontend.setVisible(false);
 
     // Horizontal splitter for ProjectTree and "Code Area"
     m_horizontalSplitter->addWidget(&m_projectTree);
@@ -112,6 +117,11 @@ QWidget* MainWindow::getCentralWidget() const
 QGridLayout* MainWindow::getLayout() const
 {
     return m_layout;
+}
+
+TerminalFrontend& MainWindow::getTerminalFrontend()
+{
+    return m_terminalFrontend;
 }
 
 void MainWindow::setComponentsVisible(bool isVisible)

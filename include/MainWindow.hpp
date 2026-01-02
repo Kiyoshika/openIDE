@@ -10,6 +10,7 @@
 #include "ProjectTree.hpp"
 #include "code/CodeEditor.hpp"
 #include "code/CodeTabPane.hpp"
+#include "terminal/TerminalFrontend.hpp"
 
 #include <QMainWindow>
 #include <QMenu>
@@ -39,6 +40,7 @@ public:
     void setComponentsVisible(bool isVisible);
     openide::AppSettings* getAppSettings() { return &m_appSettings; }
     openide::code::CodeTabPane* getCodeTabPane() { return &m_codeTabPane; }
+    openide::terminal::TerminalFrontend& getTerminalFrontend();
     void setProjectTitle(const QString& projectName);
     QString getCurrentProjectRoot() const { return m_currentProjectRoot; }
     ~MainWindow();
@@ -62,6 +64,7 @@ private:
     openide::menu::ThemeMenu m_themeMenu;
     openide::menu::SettingsMenu m_settingsMenu;
     openide::menu::TerminalMenu m_terminalMenu;
+    openide::terminal::TerminalFrontend m_terminalFrontend;
     openide::AppSettings m_appSettings;
     QString m_currentProjectName;
     QString m_currentProjectRoot;
