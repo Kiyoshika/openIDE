@@ -12,6 +12,10 @@ AppSettings::AppSettings()
     : m_fontFamily("")
     , m_fontSize(12)
     , m_tabSpace(4)
+    , m_projectTreeFontFamily("")
+    , m_projectTreeFontSize(10)
+    , m_terminalFontFamily("")
+    , m_terminalFontSize(10)
 {
     setDefaults();
 }
@@ -27,6 +31,20 @@ void AppSettings::setDefaults()
     }
     if (m_tabSpace <= 0) {
         m_tabSpace = 4;
+    }
+    if (m_projectTreeFontFamily.isEmpty()) {
+        QFont font = QFontDatabase::systemFont(QFontDatabase::GeneralFont);
+        m_projectTreeFontFamily = font.family();
+    }
+    if (m_projectTreeFontSize <= 0) {
+        m_projectTreeFontSize = 10;
+    }
+    if (m_terminalFontFamily.isEmpty()) {
+        QFont font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+        m_terminalFontFamily = font.family();
+    }
+    if (m_terminalFontSize <= 0) {
+        m_terminalFontSize = 10;
     }
 }
 
@@ -53,6 +71,30 @@ void AppSettings::setTabSpace(int spaces)
 {
     m_tabSpace = spaces;
     setDefaults(); // Ensure valid tab space
+}
+
+void AppSettings::setProjectTreeFontFamily(const QString& family)
+{
+    m_projectTreeFontFamily = family;
+    setDefaults(); // Ensure valid font
+}
+
+void AppSettings::setProjectTreeFontSize(int size)
+{
+    m_projectTreeFontSize = size;
+    setDefaults(); // Ensure valid size
+}
+
+void AppSettings::setTerminalFontFamily(const QString& family)
+{
+    m_terminalFontFamily = family;
+    setDefaults(); // Ensure valid font
+}
+
+void AppSettings::setTerminalFontSize(int size)
+{
+    m_terminalFontSize = size;
+    setDefaults(); // Ensure valid size
 }
 
 QString AppSettings::getConfigDirectory()
@@ -116,6 +158,22 @@ bool AppSettings::loadFromFile()
         m_tabSpace = obj["tabSpace"].toInt();
     }
     
+    if (obj.contains("projectTreeFontFamily") && obj["projectTreeFontFamily"].isString()) {
+        m_projectTreeFontFamily = obj["projectTreeFontFamily"].toString();
+    }
+    
+    if (obj.contains("projectTreeFontSize") && obj["projectTreeFontSize"].isDouble()) {
+        m_projectTreeFontSize = obj["projectTreeFontSize"].toInt();
+    }
+    
+    if (obj.contains("terminalFontFamily") && obj["terminalFontFamily"].isString()) {
+        m_terminalFontFamily = obj["terminalFontFamily"].toString();
+    }
+    
+    if (obj.contains("terminalFontSize") && obj["terminalFontSize"].isDouble()) {
+        m_terminalFontSize = obj["terminalFontSize"].toInt();
+    }
+    
     setDefaults(); // Ensure all values are valid
     return true;
 }
@@ -133,6 +191,10 @@ bool AppSettings::saveToFile() const
     obj["fontFamily"] = m_fontFamily;
     obj["fontSize"] = m_fontSize;
     obj["tabSpace"] = m_tabSpace;
+    obj["projectTreeFontFamily"] = m_projectTreeFontFamily;
+    obj["projectTreeFontSize"] = m_projectTreeFontSize;
+    obj["terminalFontFamily"] = m_terminalFontFamily;
+    obj["terminalFontSize"] = m_terminalFontSize;
     
     QJsonDocument doc(obj);
     QTextStream out(&file);

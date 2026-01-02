@@ -11,6 +11,7 @@
 #include <QHBoxLayout>
 #include <QFontComboBox>
 #include <QFormLayout>
+#include <QGroupBox>
 
 // forward decl
 class MainWindow;
@@ -38,9 +39,16 @@ private:
     void applySettings();
     
     openide::AppSettings* m_settings;
+    // Code Editor section
     QFontComboBox* m_fontComboBox;
     QSpinBox* m_fontSizeSpinBox;
     QSpinBox* m_tabSpaceSpinBox;
+    // Project Tree section
+    QFontComboBox* m_projectTreeFontComboBox;
+    QSpinBox* m_projectTreeFontSizeSpinBox;
+    // Terminal section
+    QFontComboBox* m_terminalFontComboBox;
+    QSpinBox* m_terminalFontSizeSpinBox;
     QPushButton* m_okButton;
     QPushButton* m_cancelButton;
     QPushButton* m_applyButton;

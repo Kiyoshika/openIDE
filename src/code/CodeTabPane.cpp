@@ -1,4 +1,5 @@
 #include "code/CodeTabPane.hpp"
+#include "ui/StyleUtils.hpp"
 #include "code/CodeEditor.hpp"
 #include "code/PaneContainer.hpp"
 #include "MainWindow.hpp"
@@ -118,19 +119,34 @@ void CodeTabPane::setupTabWidget(QTabWidget* tabWidget)
 
 void CodeTabPane::connectEditorSignals(CodeEditor* editor, QTabWidget* tabWidget)
 {
-    if (!editor || !tabWidget) return;
+    if (!editor) return;
+    
+    // Disconnect any existing fileModified connections to prevent duplicates
+    disconnect(editor, &CodeEditor::fileModified, this, nullptr);
     
     // Connect fileModified signal to mark the tab as dirty
-    connect(editor, &CodeEditor::fileModified, this, [this, editor, tabWidget]() {
-        // Find the tab index for this editor
-        for (int i = 0; i < tabWidget->count(); ++i) {
-            if (tabWidget->widget(i) == editor) {
-                QString tabText = tabWidget->tabText(i);
-                // Only add asterisk if not already present
-                if (!tabText.endsWith(" *")) {
-                    tabWidget->setTabText(i, tabText + " *");
+    // Dynamically find the tabWidget containing this editor instead of capturing it
+    // This makes the connection resilient to tab moves and pane restructuring
+    connect(editor, &CodeEditor::fileModified, this, [this, editor]() {
+        if (!editor || !m_root) return;
+        
+        // Find which tabWidget contains this editor by searching all tab widgets
+        QList<QTabWidget*> allTabWidgets;
+        m_root->getAllTabWidgets(allTabWidgets);
+        
+        for (QTabWidget* tw : allTabWidgets) {
+            if (!tw) continue;
+            
+            // Find the tab index for this editor
+            for (int i = 0; i < tw->count(); ++i) {
+                if (tw->widget(i) == editor) {
+                    QString tabText = tw->tabText(i);
+                    // Only add asterisk if not already present
+                    if (!tabText.endsWith(" *")) {
+                        tw->setTabText(i, tabText + " *");
+                    }
+                    return; // Found and updated, exit early
                 }
-                break;
             }
         }
     });
@@ -871,4 +887,31 @@ void CodeTabPane::updateAllEditorsSettings(openide::AppSettings* settings)
             }
         }
     }
+}
+
+void CodeTabPane::updateAllSplitterStyles(bool isDarkTheme)
+{
+    if (!m_root) return;
+    
+    QString handleStyle = openide::ui::StyleUtils::getSplitterHandleStyle(isDarkTheme);
+    
+    // Recursively traverse the tree to update all splitters
+    std::function<void(PaneContainer*)> updateSplitters = [&](PaneContainer* container) {
+        if (!container) return;
+        if (container->isBranch()) {
+            QSplitter* splitter = container->splitter();
+            if (splitter) {
+                splitter->setStyleSheet(handleStyle);
+            }
+            // Recursively update children
+            if (container->leftChild()) {
+                updateSplitters(container->leftChild());
+            }
+            if (container->rightChild()) {
+                updateSplitters(container->rightChild());
+            }
+        }
+    };
+    
+    updateSplitters(m_root);
 }

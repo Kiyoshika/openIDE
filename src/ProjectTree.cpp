@@ -4,6 +4,8 @@
 #include "code/CodeTabPane.hpp"
 #include "code/CodeEditor.hpp"
 #include "AppSettings.hpp"
+#include <QWheelEvent>
+#include <QShowEvent>
 
 using namespace openide;
 using namespace openide::code;
@@ -35,6 +37,11 @@ ProjectTree::ProjectTree(MainWindow* parent)
     
     // Connect double-click to our handler
     connect(this, &QTreeView::doubleClicked, this, &ProjectTree::onItemDoubleClicked);
+    
+    // Initialize font size from settings if available
+    if (parent && parent->getAppSettings()) {
+        updateFontSize(parent->getAppSettings()->projectTreeFontSize());
+    }
 }
 
 ProjectTree::~ProjectTree()
@@ -564,5 +571,70 @@ void ProjectTree::dropEvent(QDropEvent* event)
             QString("Failed to move '%1'. Check permissions.").arg(sourceInfo.fileName())
         );
         event->ignore();
+    }
+}
+
+void ProjectTree::updateFontSize(int size)
+{
+    if (size >= 6 && size <= 72) {
+        QFont currentFont = font();
+        currentFont.setPointSize(size);
+        setFont(currentFont);
+    }
+}
+
+void ProjectTree::wheelEvent(QWheelEvent* event)
+{
+    // Handle Ctrl+scroll for font size adjustment
+    if (event->modifiers() & Qt::ControlModifier) {
+        // Get the scroll direction
+        int delta = event->angleDelta().y();
+        
+        if (delta != 0) {
+            // Get MainWindow and AppSettings
+            if (m_parent && m_parent->getAppSettings()) {
+                openide::AppSettings* settings = m_parent->getAppSettings();
+                int currentSize = settings->projectTreeFontSize();
+                
+                // Adjust size based on scroll direction
+                // Clamp between reasonable bounds (6-72)
+                int newSize = currentSize;
+                if (delta > 0) {
+                    newSize = qMin(72, currentSize + 1);  // Scroll up = increase
+                } else {
+                    newSize = qMax(6, currentSize - 1);   // Scroll down = decrease
+                }
+                
+                // Only update if size actually changed
+                if (newSize != currentSize) {
+                    // Save the new font size to settings and persist to file
+                    settings->setProjectTreeFontSize(newSize);
+                    settings->saveToFile();
+                    
+                    // Update font size
+                    updateFontSize(newSize);
+                }
+            }
+            
+            event->accept();
+            return;
+        }
+    }
+    
+    // For non-Ctrl scroll, use default behavior
+    QTreeView::wheelEvent(event);
+}
+
+void ProjectTree::showEvent(QShowEvent* event)
+{
+    QTreeView::showEvent(event);
+    
+    // Reload font size from settings when tree is shown
+    // This ensures the font size is up-to-date if it was changed via Ctrl+Scroll
+    if (m_parent && m_parent->getAppSettings()) {
+        int size = m_parent->getAppSettings()->projectTreeFontSize();
+        if (size >= 6 && size <= 72) {
+            updateFontSize(size);
+        }
     }
 }

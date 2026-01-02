@@ -20,8 +20,6 @@ namespace openide::code { class FindReplaceDialog; }
 #include <QKeyEvent>
 #include <QWheelEvent>
 
-#include <functional>
-
 namespace openide::code
 {
 class LineNumberArea;

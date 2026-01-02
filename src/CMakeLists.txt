@@ -14,6 +14,7 @@ qt_add_library(${OPENIDE_CORE} SHARED
     code/CodeEditor.cpp
     code/CodeTabPane.cpp
     code/PaneContainer.cpp
+    ui/StyleUtils.cpp
     code/SyntaxHighlighter.cpp
     code/FindReplaceDialog.cpp
     code/TreeSitterWrapper.cpp
@@ -25,6 +26,11 @@ qt_add_library(${OPENIDE_CORE} SHARED
     menu/SettingsDialog.cpp
     menu/NewProjectDialog.cpp
     menu/NewFileDialog.cpp
+    menu/TerminalMenu.cpp
+    terminal/TerminalFrontend.cpp
+    terminal/TerminalBackendInterface.cpp
+    terminal/WindowsTerminalBackend.cpp
+    terminal/UnixTerminalBackend.cpp
     AppSettings.cpp
     FileType.cpp
     ProjectTree.cpp
@@ -80,7 +86,11 @@ qt_add_library(${OPENIDE_CORE} SHARED
     ${CMAKE_SOURCE_DIR}/external/tree-sitter-yaml/src/parser.c
     ${CMAKE_SOURCE_DIR}/external/tree-sitter-yaml/src/scanner.c
     # Headers
-    ../include/MainWindow.hpp ../include/code/CodeEditor.hpp ../include/code/CodeTabPane.hpp ../include/code/PaneContainer.hpp ../include/code/FindReplaceDialog.hpp ../include/code/TreeSitterWrapper.hpp ../include/code/ColorScheme.hpp ../include/menu/FileMenu.hpp ../include/menu/EditMenu.hpp ../include/menu/ThemeMenu.hpp ../include/menu/SettingsMenu.hpp ../include/menu/SettingsDialog.hpp ../include/menu/NewProjectDialog.hpp ../include/menu/NewFileDialog.hpp ../include/AppSettings.hpp ../include/FileType.hpp ../include/ProjectTree.hpp ../include/code/SyntaxHighlighter.hpp
+    ../include/MainWindow.hpp ../include/code/CodeEditor.hpp ../include/code/CodeTabPane.hpp ../include/code/PaneContainer.hpp ../include/code/FindReplaceDialog.hpp ../include/code/TreeSitterWrapper.hpp ../include/code/ColorScheme.hpp ../include/menu/FileMenu.hpp ../include/menu/EditMenu.hpp ../include/menu/ThemeMenu.hpp ../include/menu/SettingsMenu.hpp ../include/menu/SettingsDialog.hpp ../include/menu/NewProjectDialog.hpp ../include/menu/NewFileDialog.hpp ../include/AppSettings.hpp ../include/FileType.hpp ../include/ProjectTree.hpp ../include/code/SyntaxHighlighter.hpp ../include/menu/TerminalMenu.hpp ../include/terminal/TerminalFrontend.hpp
+    ../include/terminal/TerminalBackendInterface.hpp
+    ../include/terminal/WindowsTerminalBackend.hpp
+    ../include/terminal/UnixTerminalBackend.hpp
+    ../include/ui/StyleUtils.hpp
 )
 
 # Remove the target_sources line as all sources are now in qt_add_library
@@ -208,6 +218,13 @@ target_compile_definitions(${OPENIDE_CORE} PRIVATE
     TSFieldMapSlice=TSMapSlice
 )
 
+# Define Windows version for ConPTY support (Windows 10 version 1809+)
+if(WIN32)
+    target_compile_definitions(${OPENIDE_CORE} PRIVATE
+        _WIN32_WINNT=0x0A00  # Windows 10
+    )
+endif()
+
 target_include_directories(${OPENIDE_CORE} PRIVATE 
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/external/tree-sitter/lib/include
@@ -221,6 +238,11 @@ target_link_libraries(${OPENIDE_CORE} PUBLIC
     Qt${QT_VERSION_MAJOR}::Widgets 
     Qt${QT_VERSION_MAJOR}::Core
 )
+
+# On Windows, link kernel32.dll for ConPTY support (WindowsTerminalBackend)
+if(WIN32)
+    target_link_libraries(${OPENIDE_CORE} PRIVATE kernel32)
+endif()
 
 # On Windows with MinGW, export all symbols from the shared library
 if(WIN32 AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
