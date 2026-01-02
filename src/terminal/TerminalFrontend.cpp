@@ -1,6 +1,7 @@
 #include "terminal/TerminalFrontend.hpp"
 #include "terminal/TerminalBackendInterface.hpp"
 #include "MainWindow.hpp"
+#include "AppSettings.hpp"
 #include <QPainter>
 #include <QFont>
 #include <QFontMetrics>
@@ -15,11 +16,13 @@
 #include <QLabel>
 #include <QScrollBar>
 #include <QPushButton>
+#include <QWheelEvent>
 
 using namespace openide::terminal;
 
 TerminalFrontend::TerminalFrontend(MainWindow* parent, TerminalBackendInterface* backend)
     : QAbstractScrollArea(parent->getCentralWidget())
+    , m_mainWindow(parent)
     , m_backend(backend)
     , m_output()
     , m_currentDirectory()
@@ -30,7 +33,16 @@ TerminalFrontend::TerminalFrontend(MainWindow* parent, TerminalBackendInterface*
     , m_closeButton(nullptr)
     , m_isCollapsed(false)
     , m_originalHeight(0)
+    , m_fontSize(10)
 {
+    // Get initial font size from settings if available
+    if (m_mainWindow && m_mainWindow->getAppSettings()) {
+        int size = m_mainWindow->getAppSettings()->terminalFontSize();
+        // Ensure font size is valid (between 6 and 72)
+        if (size >= 6 && size <= 72) {
+            m_fontSize = size;
+        }
+    }
     // Set background color for terminal
     setStyleSheet("background-color: #1e1e1e; color: #d4d4d4;");
     
@@ -121,7 +133,7 @@ TerminalFrontend::TerminalFrontend(MainWindow* parent, TerminalBackendInterface*
     
     m_inputLine = new QLineEdit(m_inputContainer);
     m_inputLine->setStyleSheet("background-color: #252526; color: #d4d4d4; border: 1px solid #3e3e42; padding: 2px;");
-    m_inputLine->setFont(QFont("Consolas", 10));
+    m_inputLine->setFont(QFont("Consolas", m_fontSize));
     m_inputLine->installEventFilter(this);
     
     inputLayout->addWidget(m_promptLabel);
@@ -132,6 +144,9 @@ TerminalFrontend::TerminalFrontend(MainWindow* parent, TerminalBackendInterface*
     
     // Connect return key to execute command
     connect(m_inputLine, &QLineEdit::returnPressed, this, &TerminalFrontend::onCommandEntered);
+    
+    // Install event filter on viewport to catch wheel events for Ctrl+Scroll
+    viewport()->installEventFilter(this);
 }
 
 void TerminalFrontend::setBackend(TerminalBackendInterface* backend)
@@ -265,6 +280,15 @@ void TerminalFrontend::showEvent(QShowEvent* event)
 {
     QAbstractScrollArea::showEvent(event);
     
+    // Reload font size from settings when terminal is shown
+    // This ensures the font size is up-to-date if it was changed via Ctrl+Scroll
+    if (m_mainWindow && m_mainWindow->getAppSettings()) {
+        int size = m_mainWindow->getAppSettings()->terminalFontSize();
+        if (size >= 6 && size <= 72 && size != m_fontSize) {
+            updateFontSize(size);
+        }
+    }
+    
     // CRITICAL: Ensure header bar is visible and properly positioned when terminal is shown
     // This is especially important when terminal was collapsed before being hidden
     if (m_headerBar) {
@@ -332,6 +356,46 @@ bool TerminalFrontend::eventFilter(QObject* obj, QEvent* event)
         // Handle special keys if needed
         return QAbstractScrollArea::eventFilter(obj, event);
     }
+    
+    // Handle wheel events on viewport for Ctrl+Scroll font size adjustment
+    if (obj == viewport() && event->type() == QEvent::Wheel) {
+        QWheelEvent* wheelEvent = static_cast<QWheelEvent*>(event);
+        if (wheelEvent->modifiers() & Qt::ControlModifier) {
+            // Get the scroll direction
+            int delta = wheelEvent->angleDelta().y();
+            
+            if (delta != 0) {
+                // Use stored MainWindow pointer
+                if (m_mainWindow && m_mainWindow->getAppSettings()) {
+                    openide::AppSettings* settings = m_mainWindow->getAppSettings();
+                    int currentSize = settings->terminalFontSize();
+                    
+                    // Adjust size based on scroll direction
+                    // Clamp between reasonable bounds (6-72)
+                    int newSize = currentSize;
+                    if (delta > 0) {
+                        newSize = qMin(72, currentSize + 1);  // Scroll up = increase
+                    } else {
+                        newSize = qMax(6, currentSize - 1);   // Scroll down = decrease
+                    }
+                    
+                    // Only update if size actually changed
+                    if (newSize != currentSize) {
+                        // Save the new font size to settings and persist to file
+                        settings->setTerminalFontSize(newSize);
+                        settings->saveToFile();
+                        
+                        // Update stored font size and trigger repaint
+                        updateFontSize(newSize);
+                    }
+                }
+            }
+            
+            wheelEvent->accept();
+            return true; // Event handled
+        }
+    }
+    
     return QAbstractScrollArea::eventFilter(obj, event);
 }
 
@@ -634,8 +698,8 @@ void TerminalFrontend::paintEvent(QPaintEvent* event)
     
     QPainter painter(viewport());
     
-    // Set font for terminal output
-    QFont font("Consolas", 10);
+    // Set font for terminal output - use stored font size
+    QFont font("Consolas", m_fontSize);
     painter.setFont(font);
     
     QRect viewportRect = viewport()->rect();
@@ -705,4 +769,61 @@ void TerminalFrontend::paintEvent(QPaintEvent* event)
         }
     }
     // Don't draw anything when output is empty - keep it blank
+}
+
+void TerminalFrontend::updateFontSize(int size)
+{
+    if (size >= 6 && size <= 72) {
+        m_fontSize = size;
+        if (m_inputLine) {
+            m_inputLine->setFont(QFont("Consolas", m_fontSize));
+        }
+        update(); // Trigger repaint with new font size
+    }
+}
+
+void TerminalFrontend::wheelEvent(QWheelEvent* event)
+{
+    // Handle Ctrl+scroll for font size adjustment
+    if (event->modifiers() & Qt::ControlModifier) {
+        // Get the scroll direction
+        int delta = event->angleDelta().y();
+        
+        if (delta != 0) {
+            // Get MainWindow from parent hierarchy
+            QWidget* centralWidget = qobject_cast<QWidget*>(parent());
+            if (centralWidget) {
+                MainWindow* mainWindow = qobject_cast<MainWindow*>(centralWidget->parent());
+                if (mainWindow && mainWindow->getAppSettings()) {
+                    openide::AppSettings* settings = mainWindow->getAppSettings();
+                    int currentSize = settings->terminalFontSize();
+                    
+                    // Adjust size based on scroll direction
+                    // Clamp between reasonable bounds (6-72)
+                    int newSize = currentSize;
+                    if (delta > 0) {
+                        newSize = qMin(72, currentSize + 1);  // Scroll up = increase
+                    } else {
+                        newSize = qMax(6, currentSize - 1);   // Scroll down = decrease
+                    }
+                    
+                    // Only update if size actually changed
+                    if (newSize != currentSize) {
+                        // Save the new font size to settings and persist to file
+                        settings->setTerminalFontSize(newSize);
+                        settings->saveToFile();
+                        
+                        // Update stored font size and trigger repaint
+                        updateFontSize(newSize);
+                    }
+                }
+            }
+            
+            event->accept();
+            return;
+        }
+    }
+    
+    // For non-Ctrl scroll, use default behavior
+    QAbstractScrollArea::wheelEvent(event);
 }

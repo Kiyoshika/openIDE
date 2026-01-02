@@ -22,6 +22,8 @@ namespace openide { class AppSettings; }
 #include <QDragEnterEvent>
 #include <QDragMoveEvent>
 #include <QDropEvent>
+#include <QWheelEvent>
+#include <QShowEvent>
 
 namespace openide
 {
@@ -32,12 +34,15 @@ namespace openide
         ProjectTree(MainWindow* parent);
         void loadTreeFromDir(const QString* dirPath);
         ~ProjectTree();
-        
+        void updateFontSize(int size);
+    
     protected:
         void contextMenuEvent(QContextMenuEvent* event) override;
         void dragEnterEvent(QDragEnterEvent* event) override;
         void dragMoveEvent(QDragMoveEvent* event) override;
         void dropEvent(QDropEvent* event) override;
+        void wheelEvent(QWheelEvent* event) override;
+        void showEvent(QShowEvent* event) override;
         
     private slots:
         void onItemDoubleClicked(const QModelIndex& index);

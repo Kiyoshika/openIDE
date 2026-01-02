@@ -100,9 +100,12 @@ MainWindow::MainWindow(QWidget *parent)
         m_codeTabPane.updateAllSplitterStyles(isDark);
     });
     
-    // Connect settings changes to update all code editors
+    // Connect settings changes to update all code editors, project tree, and terminal
     connect(&m_settingsMenu, &openide::menu::SettingsMenu::settingsChanged, this, [this](){
         m_codeTabPane.updateAllEditorsSettings(&m_appSettings);
+        m_projectTree.updateFontSize(m_appSettings.projectTreeFontSize());
+        // Update terminal font size (font family is handled via settings, but we only expose size control)
+        m_terminalFrontend.updateFontSize(m_appSettings.terminalFontSize());
     });
     
     // Connect project opened signal to update title

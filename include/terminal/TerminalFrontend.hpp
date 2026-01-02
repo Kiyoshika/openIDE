@@ -26,6 +26,7 @@ public:
     void setBackend(TerminalBackendInterface* backend);
     void init();
     void updateTheme(bool isDarkTheme);
+    void updateFontSize(int size);
     bool isCollapsed() const { return m_isCollapsed; }
     void forceOpen(); // Force terminal to be visible and expanded
     
@@ -37,6 +38,7 @@ protected:
     void paintEvent(QPaintEvent* event) override;
     void showEvent(QShowEvent* event) override;
     void resizeEvent(QResizeEvent* event) override;
+    void wheelEvent(QWheelEvent* event) override;
     bool eventFilter(QObject* obj, QEvent* event) override;
     
 private slots:
@@ -50,6 +52,7 @@ private:
     
     void updateHeaderButtons();
     
+    MainWindow* m_mainWindow;
     TerminalBackendInterface* m_backend;
     QString m_output;
     QString m_currentDirectory;
@@ -61,6 +64,7 @@ private:
     QPushButton* m_closeButton;
     bool m_isCollapsed;
     int m_originalHeight;
+    int m_fontSize;
 };
 } // namespace openide::terminal
 #endif

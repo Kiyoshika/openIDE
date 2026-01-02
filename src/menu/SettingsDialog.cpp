@@ -9,6 +9,7 @@
 #include <QSpinBox>
 #include <QPushButton>
 #include <QLabel>
+#include <QGroupBox>
 
 using namespace openide;
 using namespace openide::menu;
@@ -19,6 +20,10 @@ SettingsDialog::SettingsDialog(MainWindow* parent, AppSettings* settings)
     , m_fontComboBox(nullptr)
     , m_fontSizeSpinBox(nullptr)
     , m_tabSpaceSpinBox(nullptr)
+    , m_projectTreeFontComboBox(nullptr)
+    , m_projectTreeFontSizeSpinBox(nullptr)
+    , m_terminalFontComboBox(nullptr)
+    , m_terminalFontSizeSpinBox(nullptr)
     , m_okButton(nullptr)
     , m_cancelButton(nullptr)
     , m_applyButton(nullptr)
@@ -32,34 +37,69 @@ SettingsDialog::SettingsDialog(MainWindow* parent, AppSettings* settings)
     
     setWindowTitle("Settings");
     setModal(true);
-    resize(400, 200);
+    resize(450, 500);
 }
 
 void SettingsDialog::setupUI()
 {
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
+    mainLayout->setSpacing(15);
     
-    QFormLayout* formLayout = new QFormLayout();
+    // Code Editor section
+    QGroupBox* codeEditorGroup = new QGroupBox("Code Editor", this);
+    QFormLayout* codeEditorLayout = new QFormLayout(codeEditorGroup);
     
-    // Font selection
-    m_fontComboBox = new QFontComboBox(this);
-    formLayout->addRow("Font:", m_fontComboBox);
+    m_fontComboBox = new QFontComboBox(codeEditorGroup);
+    codeEditorLayout->addRow("Font:", m_fontComboBox);
     
-    // Font size
-    m_fontSizeSpinBox = new QSpinBox(this);
+    m_fontSizeSpinBox = new QSpinBox(codeEditorGroup);
     m_fontSizeSpinBox->setMinimum(6);
     m_fontSizeSpinBox->setMaximum(72);
     m_fontSizeSpinBox->setValue(12);
-    formLayout->addRow("Font Size:", m_fontSizeSpinBox);
+    codeEditorLayout->addRow("Font Size:", m_fontSizeSpinBox);
     
-    // Tab space
-    m_tabSpaceSpinBox = new QSpinBox(this);
+    m_tabSpaceSpinBox = new QSpinBox(codeEditorGroup);
     m_tabSpaceSpinBox->setMinimum(1);
     m_tabSpaceSpinBox->setMaximum(16);
     m_tabSpaceSpinBox->setValue(4);
-    formLayout->addRow("Tab Space:", m_tabSpaceSpinBox);
+    codeEditorLayout->addRow("Tab Space:", m_tabSpaceSpinBox);
     
-    mainLayout->addLayout(formLayout);
+    codeEditorGroup->setLayout(codeEditorLayout);
+    mainLayout->addWidget(codeEditorGroup);
+    
+    // Project Tree section
+    QGroupBox* projectTreeGroup = new QGroupBox("Project Tree", this);
+    QFormLayout* projectTreeLayout = new QFormLayout(projectTreeGroup);
+    
+    m_projectTreeFontComboBox = new QFontComboBox(projectTreeGroup);
+    projectTreeLayout->addRow("Font:", m_projectTreeFontComboBox);
+    
+    m_projectTreeFontSizeSpinBox = new QSpinBox(projectTreeGroup);
+    m_projectTreeFontSizeSpinBox->setMinimum(6);
+    m_projectTreeFontSizeSpinBox->setMaximum(72);
+    m_projectTreeFontSizeSpinBox->setValue(10);
+    projectTreeLayout->addRow("Font Size:", m_projectTreeFontSizeSpinBox);
+    
+    projectTreeGroup->setLayout(projectTreeLayout);
+    mainLayout->addWidget(projectTreeGroup);
+    
+    // Terminal section
+    QGroupBox* terminalGroup = new QGroupBox("Terminal", this);
+    QFormLayout* terminalLayout = new QFormLayout(terminalGroup);
+    
+    m_terminalFontComboBox = new QFontComboBox(terminalGroup);
+    terminalLayout->addRow("Font:", m_terminalFontComboBox);
+    
+    m_terminalFontSizeSpinBox = new QSpinBox(terminalGroup);
+    m_terminalFontSizeSpinBox->setMinimum(6);
+    m_terminalFontSizeSpinBox->setMaximum(72);
+    m_terminalFontSizeSpinBox->setValue(10);
+    terminalLayout->addRow("Font Size:", m_terminalFontSizeSpinBox);
+    
+    terminalGroup->setLayout(terminalLayout);
+    mainLayout->addWidget(terminalGroup);
+    
+    mainLayout->addStretch();
     
     // Buttons
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel | QDialogButtonBox::Apply, this);
@@ -79,18 +119,36 @@ void SettingsDialog::loadSettings()
 {
     if (!m_settings) return;
     
+    // Code Editor settings
     m_fontComboBox->setCurrentFont(QFont(m_settings->fontFamily()));
     m_fontSizeSpinBox->setValue(m_settings->fontSize());
     m_tabSpaceSpinBox->setValue(m_settings->tabSpace());
+    
+    // Project Tree settings
+    m_projectTreeFontComboBox->setCurrentFont(QFont(m_settings->projectTreeFontFamily()));
+    m_projectTreeFontSizeSpinBox->setValue(m_settings->projectTreeFontSize());
+    
+    // Terminal settings
+    m_terminalFontComboBox->setCurrentFont(QFont(m_settings->terminalFontFamily()));
+    m_terminalFontSizeSpinBox->setValue(m_settings->terminalFontSize());
 }
 
 void SettingsDialog::applySettings()
 {
     if (!m_settings) return;
     
+    // Code Editor settings
     m_settings->setFontFamily(m_fontComboBox->currentFont().family());
     m_settings->setFontSize(m_fontSizeSpinBox->value());
     m_settings->setTabSpace(m_tabSpaceSpinBox->value());
+    
+    // Project Tree settings
+    m_settings->setProjectTreeFontFamily(m_projectTreeFontComboBox->currentFont().family());
+    m_settings->setProjectTreeFontSize(m_projectTreeFontSizeSpinBox->value());
+    
+    // Terminal settings
+    m_settings->setTerminalFontFamily(m_terminalFontComboBox->currentFont().family());
+    m_settings->setTerminalFontSize(m_terminalFontSizeSpinBox->value());
     
     m_settings->saveToFile();
     emit settingsChanged();
