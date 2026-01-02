@@ -4,6 +4,10 @@
 #include "menu/ThemeMenu.hpp"
 #include "menu/SettingsMenu.hpp"
 #include "AppSettings.hpp"
+#include "terminal/TerminalBackendInterface.hpp"
+#ifdef WIN32
+#include "terminal/WindowsTerminalBackend.hpp"
+#endif
 #include <QApplication>
 
 using namespace openide;
@@ -24,10 +28,22 @@ MainWindow::MainWindow(QWidget *parent)
     , m_themeMenu(this, this->menuBar())
     , m_settingsMenu(this, this->menuBar(), &m_appSettings)
     , m_terminalMenu(this, this->menuBar())
-    , m_terminalFrontend(this)
+    , m_terminalBackend(nullptr)
+    , m_terminalFrontend(this, nullptr)
 {
     // Load settings on startup
     m_appSettings.loadFromFile();
+    
+    // Create OS-specific terminal backend
+#ifdef WIN32
+    m_terminalBackend = new WindowsTerminalBackend();
+#else
+    // TODO: Add other OS backends (macOS, Linux) when implemented
+    m_terminalBackend = nullptr;
+#endif
+    
+    // Set the backend in the terminal frontend
+    m_terminalFrontend.setBackend(m_terminalBackend);
     
     // Initialize window title
     setWindowTitle("openIDE");
@@ -67,11 +83,12 @@ MainWindow::MainWindow(QWidget *parent)
 
     // ProjectTree handles file opening internally now
     
-    // Connect theme changes to update all code editors
+    // Connect theme changes to update all code editors and terminal
     // The themeChanged signal emits the actual theme (Light or Dark), not System
     connect(&m_themeMenu, &openide::menu::ThemeMenu::themeChanged, this, [this](openide::menu::ThemeMenu::Theme theme){
         bool isDark = (theme == openide::menu::ThemeMenu::Theme::Dark);
         m_codeTabPane.updateAllEditorsTheme(isDark);
+        m_terminalFrontend.updateTheme(isDark);
     });
     
     // Connect settings changes to update all code editors
@@ -147,6 +164,12 @@ void MainWindow::toggleProjectTree()
 
 MainWindow::~MainWindow()
 {
+    // Cleanup terminal backend
+    if (m_terminalBackend) {
+        delete m_terminalBackend;
+        m_terminalBackend = nullptr;
+    }
+    
     delete m_centralWidget;
     delete m_layout;
 }

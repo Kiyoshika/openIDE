@@ -64,6 +64,7 @@ private:
     openide::menu::ThemeMenu m_themeMenu;
     openide::menu::SettingsMenu m_settingsMenu;
     openide::menu::TerminalMenu m_terminalMenu;
+    openide::terminal::TerminalBackendInterface* m_terminalBackend;
     openide::terminal::TerminalFrontend m_terminalFrontend;
     openide::AppSettings m_appSettings;
     QString m_currentProjectName;
