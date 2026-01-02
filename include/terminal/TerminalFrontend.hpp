@@ -7,6 +7,8 @@
 #include <QShowEvent>
 #include <QLineEdit>
 #include <QLabel>
+#include <QPushButton>
+#include <QWidget>
 
 // forward decl
 class MainWindow;
@@ -24,6 +26,12 @@ public:
     void setBackend(TerminalBackendInterface* backend);
     void init();
     void updateTheme(bool isDarkTheme);
+    bool isCollapsed() const { return m_isCollapsed; }
+    void forceOpen(); // Force terminal to be visible and expanded
+    
+public slots:
+    void toggleCollapse();
+    void closeTerminal();
     
 protected:
     void paintEvent(QPaintEvent* event) override;
@@ -40,12 +48,19 @@ private:
     QString getCurrentDirectory() const;
     void updatePrompt();
     
+    void updateHeaderButtons();
+    
     TerminalBackendInterface* m_backend;
     QString m_output;
     QString m_currentDirectory;
     QLineEdit* m_inputLine;
     QWidget* m_inputContainer;
     QLabel* m_promptLabel;
+    QWidget* m_headerBar;
+    QPushButton* m_collapseButton;
+    QPushButton* m_closeButton;
+    bool m_isCollapsed;
+    int m_originalHeight;
 };
 } // namespace openide::terminal
 #endif

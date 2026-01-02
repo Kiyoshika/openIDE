@@ -14,13 +14,14 @@ struct WindowsTerminalBackend : public TerminalBackendInterface
     virtual ~WindowsTerminalBackend();
     
     void init() override;
-    void close();
+    void close() override;
     QString executeCommand(const QString& command, const QString& workingDirectory = QString()) override;
+    
+protected:
+    QString platformSpecificCleanOutput(const QString& output) override;
     
 private:
     QProcess* m_process;
-    bool m_isInitialized;
-    QString m_workingDirectory;
 };
 }
 #endif // WIN32

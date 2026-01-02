@@ -22,6 +22,7 @@ void TerminalMenu::onNewTerminalTriggered()
 {
     if (!m_parent) return;
     TerminalFrontend& terminalFrontend = m_parent->getTerminalFrontend();
-    terminalFrontend.setVisible(true);
-    // TODO: initialize the actual terminal; terminalFrontend.init() or something
+    
+    // Force open the terminal - this will expand if collapsed and ensure it's visible
+    terminalFrontend.forceOpen();
 }

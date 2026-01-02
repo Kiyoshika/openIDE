@@ -1,4 +1,5 @@
 #include "code/CodeTabPane.hpp"
+#include "ui/StyleUtils.hpp"
 #include "code/CodeEditor.hpp"
 #include "code/PaneContainer.hpp"
 #include "MainWindow.hpp"
@@ -892,14 +893,7 @@ void CodeTabPane::updateAllSplitterStyles(bool isDarkTheme)
 {
     if (!m_root) return;
     
-    QString handleStyle;
-    if (isDarkTheme) {
-        // Dark theme: lighter handle to distinguish from dark background
-        handleStyle = "QSplitter::handle { background-color: #4a4a4a; }";
-    } else {
-        // Light theme: slightly darker handle to distinguish from light background
-        handleStyle = "QSplitter::handle { background-color: #d0d0d0; }";
-    }
+    QString handleStyle = openide::ui::StyleUtils::getSplitterHandleStyle(isDarkTheme);
     
     // Recursively traverse the tree to update all splitters
     std::function<void(PaneContainer*)> updateSplitters = [&](PaneContainer* container) {

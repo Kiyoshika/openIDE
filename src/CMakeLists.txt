@@ -14,6 +14,7 @@ qt_add_library(${OPENIDE_CORE} SHARED
     code/CodeEditor.cpp
     code/CodeTabPane.cpp
     code/PaneContainer.cpp
+    ui/StyleUtils.cpp
     code/SyntaxHighlighter.cpp
     code/FindReplaceDialog.cpp
     code/TreeSitterWrapper.cpp
@@ -27,7 +28,9 @@ qt_add_library(${OPENIDE_CORE} SHARED
     menu/NewFileDialog.cpp
     menu/TerminalMenu.cpp
     terminal/TerminalFrontend.cpp
+    terminal/TerminalBackendInterface.cpp
     terminal/WindowsTerminalBackend.cpp
+    terminal/UnixTerminalBackend.cpp
     AppSettings.cpp
     FileType.cpp
     ProjectTree.cpp
@@ -86,6 +89,8 @@ qt_add_library(${OPENIDE_CORE} SHARED
     ../include/MainWindow.hpp ../include/code/CodeEditor.hpp ../include/code/CodeTabPane.hpp ../include/code/PaneContainer.hpp ../include/code/FindReplaceDialog.hpp ../include/code/TreeSitterWrapper.hpp ../include/code/ColorScheme.hpp ../include/menu/FileMenu.hpp ../include/menu/EditMenu.hpp ../include/menu/ThemeMenu.hpp ../include/menu/SettingsMenu.hpp ../include/menu/SettingsDialog.hpp ../include/menu/NewProjectDialog.hpp ../include/menu/NewFileDialog.hpp ../include/AppSettings.hpp ../include/FileType.hpp ../include/ProjectTree.hpp ../include/code/SyntaxHighlighter.hpp ../include/menu/TerminalMenu.hpp ../include/terminal/TerminalFrontend.hpp
     ../include/terminal/TerminalBackendInterface.hpp
     ../include/terminal/WindowsTerminalBackend.hpp
+    ../include/terminal/UnixTerminalBackend.hpp
+    ../include/ui/StyleUtils.hpp
 )
 
 # Remove the target_sources line as all sources are now in qt_add_library

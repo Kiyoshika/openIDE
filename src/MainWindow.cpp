@@ -4,9 +4,12 @@
 #include "menu/ThemeMenu.hpp"
 #include "menu/SettingsMenu.hpp"
 #include "AppSettings.hpp"
+#include "ui/StyleUtils.hpp"
 #include "terminal/TerminalBackendInterface.hpp"
 #ifdef WIN32
 #include "terminal/WindowsTerminalBackend.hpp"
+#else
+#include "terminal/UnixTerminalBackend.hpp"
 #endif
 #include <QApplication>
 
@@ -38,8 +41,8 @@ MainWindow::MainWindow(QWidget *parent)
 #ifdef WIN32
     m_terminalBackend = new WindowsTerminalBackend();
 #else
-    // TODO: Add other OS backends (macOS, Linux) when implemented
-    m_terminalBackend = nullptr;
+    // Unix backend works for both macOS and Linux
+    m_terminalBackend = new UnixTerminalBackend();
 #endif
     
     // Set the backend in the terminal frontend
@@ -65,7 +68,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_verticalSplitter->setOpaqueResize(false);
     m_verticalSplitter->setHandleWidth(3);
     // Set initial style (will be updated when theme is applied)
-    m_verticalSplitter->setStyleSheet("QSplitter::handle { background-color: #4a4a4a; }");
+    m_verticalSplitter->setStyleSheet(openide::ui::StyleUtils::getSplitterHandleStyle(true));
     
     // Hide terminal by default
     m_terminalFrontend.setVisible(false);
@@ -77,7 +80,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_horizontalSplitter->setHandleWidth(3);
     m_horizontalSplitter->setOpaqueResize(false);
     // Set initial style (will be updated when theme is applied)
-    m_horizontalSplitter->setStyleSheet("QSplitter::handle { background-color: #4a4a4a; }");
+    m_horizontalSplitter->setStyleSheet(openide::ui::StyleUtils::getSplitterHandleStyle(true));
     
     // Add splitter to layout
     m_layout->addWidget(m_horizontalSplitter, 0, 0);
@@ -155,14 +158,7 @@ void MainWindow::setComponentsVisible(bool isVisible)
 
 void MainWindow::updateSplitterStyles(bool isDarkTheme)
 {
-    QString handleStyle;
-    if (isDarkTheme) {
-        // Dark theme: lighter handle to distinguish from dark background (#353535)
-        handleStyle = "QSplitter::handle { background-color: #4a4a4a; }";
-    } else {
-        // Light theme: slightly darker handle to distinguish from light background (#ffffff)
-        handleStyle = "QSplitter::handle { background-color: #d0d0d0; }";
-    }
+    QString handleStyle = openide::ui::StyleUtils::getSplitterHandleStyle(isDarkTheme);
     
     // Apply to main window splitters
     if (m_horizontalSplitter) {

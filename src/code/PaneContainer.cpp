@@ -1,4 +1,5 @@
 #include "code/PaneContainer.hpp"
+#include "ui/StyleUtils.hpp"
 #include "code/CodeEditor.hpp"
 #include "MainWindow.hpp"
 
@@ -94,7 +95,7 @@ void PaneContainer::convertToBranch(Qt::Orientation orientation)
     m_splitter->setOpaqueResize(false);
     // Set initial style based on current theme (will be updated when theme changes)
     // Default to dark theme style
-    m_splitter->setStyleSheet("QSplitter::handle { background-color: #4a4a4a; }");
+    m_splitter->setStyleSheet(openide::ui::StyleUtils::getSplitterHandleStyle(true));
     m_layout->addWidget(m_splitter);
 
     // Create two child containers
