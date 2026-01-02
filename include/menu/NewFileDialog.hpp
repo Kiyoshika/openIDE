@@ -48,3 +48,4 @@ private:
 #endif // NEWFILEDIALOG_HPP
 
 
+

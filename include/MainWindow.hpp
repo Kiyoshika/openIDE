@@ -5,6 +5,7 @@
 #include "menu/EditMenu.hpp"
 #include "menu/ThemeMenu.hpp"
 #include "menu/SettingsMenu.hpp"
+#include "menu/TerminalMenu.hpp"
 #include "AppSettings.hpp"
 #include "ProjectTree.hpp"
 #include "code/CodeEditor.hpp"
@@ -35,7 +36,6 @@ public:
     MainWindow(QWidget *parent = nullptr);
     QWidget* getCentralWidget() const;
     QGridLayout* getLayout() const;
-    QSplitter* getSplitter() const { return m_splitter; }
     void setComponentsVisible(bool isVisible);
     openide::AppSettings* getAppSettings() { return &m_appSettings; }
     openide::code::CodeTabPane* getCodeTabPane() { return &m_codeTabPane; }
@@ -51,7 +51,8 @@ private:
     Ui::MainWindow *ui;
     QWidget* m_centralWidget;
     QGridLayout* m_layout;
-    QSplitter* m_splitter;
+    QSplitter* m_horizontalSplitter;
+    QSplitter* m_verticalSplitter;
     QToolBar* m_toolBar;
     QAction* m_toggleTreeAction;
     openide::ProjectTree m_projectTree;
@@ -60,6 +61,7 @@ private:
     openide::menu::EditMenu m_editMenu;
     openide::menu::ThemeMenu m_themeMenu;
     openide::menu::SettingsMenu m_settingsMenu;
+    openide::menu::TerminalMenu m_terminalMenu;
     openide::AppSettings m_appSettings;
     QString m_currentProjectName;
     QString m_currentProjectRoot;

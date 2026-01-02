@@ -8,8 +8,6 @@
 #include <QMenu>
 #include <QMenuBar>
 
-#include <functional>
-
 // forward decl
 class MainWindow;
 

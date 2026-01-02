@@ -12,7 +12,8 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , m_centralWidget(new QWidget(this))
     , m_layout(new QGridLayout(m_centralWidget))
-    , m_splitter(new QSplitter(Qt::Horizontal, m_centralWidget))
+    , m_horizontalSplitter(new QSplitter(Qt::Horizontal, m_centralWidget))
+    , m_verticalSplitter(new QSplitter(Qt::Vertical, m_centralWidget))
     , m_toolBar(nullptr)
     , m_toggleTreeAction(nullptr)
     , m_projectTree(this)
@@ -21,6 +22,7 @@ MainWindow::MainWindow(QWidget *parent)
     , m_editMenu(this, this->menuBar(), &m_codeTabPane)
     , m_themeMenu(this, this->menuBar())
     , m_settingsMenu(this, this->menuBar(), &m_appSettings)
+    , m_terminalMenu(this, this->menuBar())
 {
     // Load settings on startup
     m_appSettings.loadFromFile();
@@ -38,22 +40,22 @@ MainWindow::MainWindow(QWidget *parent)
     m_toggleTreeAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_B));
     connect(m_toggleTreeAction, &QAction::triggered, this, &MainWindow::toggleProjectTree);
 
-    // Setup splitter with ProjectTree and CodeTabPane
-    // Note: Don't manually add widgets to layout in their constructors anymore
-    // The splitter manages them now
-    m_splitter->addWidget(&m_projectTree);
-    m_splitter->addWidget(&m_codeTabPane);
-    
-    // Set initial sizes: ~20% for tree, ~80% for editor
-    QList<int> sizes;
-    sizes << 240 << 960;  // Based on 1200px width
-    m_splitter->setSizes(sizes);
-    
-    // Make splitter handle more visible
-    m_splitter->setHandleWidth(3);
+    // Vertical splitter for the CodeTabPane and TerminalFrontend
+    m_verticalSplitter->addWidget(&m_codeTabPane);
+    //m_verticalSplitter->addWidget(&m_terminalFrontend);
+    m_verticalSplitter->setSizes({800, 0}); // terminal is 0 by default
+    m_verticalSplitter->setOpaqueResize(false);
+    m_verticalSplitter->setHandleWidth(3);
+
+    // Horizontal splitter for ProjectTree and "Code Area"
+    m_horizontalSplitter->addWidget(&m_projectTree);
+    m_horizontalSplitter->addWidget(m_verticalSplitter);
+    m_horizontalSplitter->setSizes({240, 960}); // Based on 1200px width
+    m_horizontalSplitter->setHandleWidth(3);
+    m_horizontalSplitter->setOpaqueResize(false);
     
     // Add splitter to layout
-    m_layout->addWidget(m_splitter, 0, 0);
+    m_layout->addWidget(m_horizontalSplitter, 0, 0);
     m_layout->setContentsMargins(0, 0, 0, 0);
 
     /* CALLBACKS/HANDLER INITIALIZATION */

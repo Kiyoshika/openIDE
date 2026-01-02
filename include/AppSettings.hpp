@@ -43,3 +43,4 @@ private:
 #endif // APPSETTINGS_HPP
 
 
+
