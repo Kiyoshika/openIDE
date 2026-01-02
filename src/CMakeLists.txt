@@ -218,13 +218,6 @@ target_compile_definitions(${OPENIDE_CORE} PRIVATE
     TSFieldMapSlice=TSMapSlice
 )
 
-# Define Windows version for ConPTY support (Windows 10 version 1809+)
-if(WIN32)
-    target_compile_definitions(${OPENIDE_CORE} PRIVATE
-        _WIN32_WINNT=0x0A00  # Windows 10
-    )
-endif()
-
 target_include_directories(${OPENIDE_CORE} PRIVATE 
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/external/tree-sitter/lib/include
@@ -238,11 +231,6 @@ target_link_libraries(${OPENIDE_CORE} PUBLIC
     Qt${QT_VERSION_MAJOR}::Widgets 
     Qt${QT_VERSION_MAJOR}::Core
 )
-
-# On Windows, link kernel32.dll for ConPTY support (WindowsTerminalBackend)
-if(WIN32)
-    target_link_libraries(${OPENIDE_CORE} PRIVATE kernel32)
-endif()
 
 # On Windows with MinGW, export all symbols from the shared library
 if(WIN32 AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
