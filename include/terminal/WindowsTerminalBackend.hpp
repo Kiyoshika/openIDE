@@ -15,7 +15,7 @@ struct WindowsTerminalBackend : public TerminalBackendInterface
     
     void init() override;
     void close();
-    QString executeCommand(const QString& command, const QString& workingDirectory = QString());
+    QString executeCommand(const QString& command, const QString& workingDirectory = QString()) override;
     
 private:
     QProcess* m_process;

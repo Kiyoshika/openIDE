@@ -64,16 +64,20 @@ MainWindow::MainWindow(QWidget *parent)
     m_verticalSplitter->setSizes({550, 250});
     m_verticalSplitter->setOpaqueResize(false);
     m_verticalSplitter->setHandleWidth(3);
+    // Set initial style (will be updated when theme is applied)
+    m_verticalSplitter->setStyleSheet("QSplitter::handle { background-color: #4a4a4a; }");
     
     // Hide terminal by default
     m_terminalFrontend.setVisible(false);
-
+    
     // Horizontal splitter for ProjectTree and "Code Area"
     m_horizontalSplitter->addWidget(&m_projectTree);
     m_horizontalSplitter->addWidget(m_verticalSplitter);
     m_horizontalSplitter->setSizes({240, 960}); // Based on 1200px width
     m_horizontalSplitter->setHandleWidth(3);
     m_horizontalSplitter->setOpaqueResize(false);
+    // Set initial style (will be updated when theme is applied)
+    m_horizontalSplitter->setStyleSheet("QSplitter::handle { background-color: #4a4a4a; }");
     
     // Add splitter to layout
     m_layout->addWidget(m_horizontalSplitter, 0, 0);
@@ -83,12 +87,14 @@ MainWindow::MainWindow(QWidget *parent)
 
     // ProjectTree handles file opening internally now
     
-    // Connect theme changes to update all code editors and terminal
+    // Connect theme changes to update all code editors, terminal, and splitter styles
     // The themeChanged signal emits the actual theme (Light or Dark), not System
     connect(&m_themeMenu, &openide::menu::ThemeMenu::themeChanged, this, [this](openide::menu::ThemeMenu::Theme theme){
         bool isDark = (theme == openide::menu::ThemeMenu::Theme::Dark);
         m_codeTabPane.updateAllEditorsTheme(isDark);
         m_terminalFrontend.updateTheme(isDark);
+        updateSplitterStyles(isDark);
+        m_codeTabPane.updateAllSplitterStyles(isDark);
     });
     
     // Connect settings changes to update all code editors
@@ -145,6 +151,26 @@ void MainWindow::setComponentsVisible(bool isVisible)
 {
     m_projectTree.setVisible(isVisible);
     m_codeTabPane.setComponentVisible(isVisible);
+}
+
+void MainWindow::updateSplitterStyles(bool isDarkTheme)
+{
+    QString handleStyle;
+    if (isDarkTheme) {
+        // Dark theme: lighter handle to distinguish from dark background (#353535)
+        handleStyle = "QSplitter::handle { background-color: #4a4a4a; }";
+    } else {
+        // Light theme: slightly darker handle to distinguish from light background (#ffffff)
+        handleStyle = "QSplitter::handle { background-color: #d0d0d0; }";
+    }
+    
+    // Apply to main window splitters
+    if (m_horizontalSplitter) {
+        m_horizontalSplitter->setStyleSheet(handleStyle);
+    }
+    if (m_verticalSplitter) {
+        m_verticalSplitter->setStyleSheet(handleStyle);
+    }
 }
 
 void MainWindow::toggleProjectTree()

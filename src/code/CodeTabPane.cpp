@@ -887,3 +887,37 @@ void CodeTabPane::updateAllEditorsSettings(openide::AppSettings* settings)
         }
     }
 }
+
+void CodeTabPane::updateAllSplitterStyles(bool isDarkTheme)
+{
+    if (!m_root) return;
+    
+    QString handleStyle;
+    if (isDarkTheme) {
+        // Dark theme: lighter handle to distinguish from dark background
+        handleStyle = "QSplitter::handle { background-color: #4a4a4a; }";
+    } else {
+        // Light theme: slightly darker handle to distinguish from light background
+        handleStyle = "QSplitter::handle { background-color: #d0d0d0; }";
+    }
+    
+    // Recursively traverse the tree to update all splitters
+    std::function<void(PaneContainer*)> updateSplitters = [&](PaneContainer* container) {
+        if (!container) return;
+        if (container->isBranch()) {
+            QSplitter* splitter = container->splitter();
+            if (splitter) {
+                splitter->setStyleSheet(handleStyle);
+            }
+            // Recursively update children
+            if (container->leftChild()) {
+                updateSplitters(container->leftChild());
+            }
+            if (container->rightChild()) {
+                updateSplitters(container->rightChild());
+            }
+        }
+    };
+    
+    updateSplitters(m_root);
+}

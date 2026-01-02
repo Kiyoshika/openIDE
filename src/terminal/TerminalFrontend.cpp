@@ -1,6 +1,5 @@
 #include "terminal/TerminalFrontend.hpp"
 #include "terminal/TerminalBackendInterface.hpp"
-#include "terminal/WindowsTerminalBackend.hpp"
 #include "MainWindow.hpp"
 #include <QPainter>
 #include <QFont>
@@ -15,9 +14,6 @@
 #include <QResizeEvent>
 #include <QLabel>
 #include <QScrollBar>
-#ifdef WIN32
-#include <windows.h>
-#endif
 
 using namespace openide::terminal;
 
@@ -165,6 +161,23 @@ void TerminalFrontend::onCommandEntered()
     executeUserCommand(command);
 }
 
+// Helper function to expand tilde (~) to home directory
+static QString expandTilde(const QString& path)
+{
+    if (path.startsWith("~/")) {
+        // Replace ~/ with home path
+        return QDir::homePath() + path.mid(1);
+    } else if (path == "~") {
+        // Just ~ means home directory
+        return QDir::homePath();
+    } else if (path.startsWith("~")) {
+        // Handle ~username or other tilde patterns
+        // For now, just expand ~ to home (more complex expansion can be added later)
+        return QDir::homePath() + path.mid(1);
+    }
+    return path;
+}
+
 void TerminalFrontend::executeUserCommand(const QString& command)
 {
     if (!m_backend) {
@@ -172,19 +185,32 @@ void TerminalFrontend::executeUserCommand(const QString& command)
         return;
     }
     
+    // Handle clear command specially to clear the output (before showing the command)
+    if (command.compare("clear", Qt::CaseInsensitive) == 0) {
+        m_output.clear();
+        update();
+        // Reset scroll position
+        QScrollBar* vbar = verticalScrollBar();
+        if (vbar) {
+            vbar->setValue(0);
+        }
+        return;
+    }
+    
     // Show the command with prompt
     appendOutput(m_currentDirectory + "> " + command + "\n");
     
-#ifdef WIN32
-    WindowsTerminalBackend* windowsBackend = dynamic_cast<WindowsTerminalBackend*>(m_backend);
-    if (windowsBackend) {
-        // Handle cd command specially to update current directory
-        if (command.startsWith("cd ", Qt::CaseInsensitive)) {
-            QString newDir = command.mid(3).trimmed();
-            if (newDir.isEmpty()) {
-                // cd without arguments - go to home
-                newDir = QDir::homePath();
-            } else if (newDir == "..") {
+    // Handle cd command specially to update current directory
+    if (command.startsWith("cd ", Qt::CaseInsensitive)) {
+        QString newDir = command.mid(3).trimmed();
+        if (newDir.isEmpty()) {
+            // cd without arguments - go to home
+            newDir = QDir::homePath();
+        } else {
+            // Expand tilde if present
+            newDir = expandTilde(newDir);
+            
+            if (newDir == "..") {
                 // Go up one directory
                 QDir dir(m_currentDirectory);
                 dir.cdUp();
@@ -200,64 +226,92 @@ void TerminalFrontend::executeUserCommand(const QString& command)
                     return;
                 }
             }
-            
-            // Update current directory
-            QDir dir(newDir);
-            if (dir.exists()) {
-                m_currentDirectory = dir.absolutePath();
-                updatePrompt();
-            } else {
-                appendOutput("Error: Directory not found: " + newDir + "\n");
-            }
-        } else {
-            // Execute the command with the current working directory
-            QString result = windowsBackend->executeCommand(command, m_currentDirectory);
-            
-            // Append the result (even if empty, to show command was executed)
-            if (!result.isEmpty()) {
-                appendOutput(result);
-                if (!result.endsWith('\n')) {
-                    appendOutput("\n");
-                }
-            } else {
-                // No output - might be a silent command, add a newline for spacing
-                appendOutput("\n");
-            }
-            
-            // Don't reset the directory - keep the tracked directory
-            // Only update if the command actually changed directories (handled by cd command)
+        }
+        
+        // Update current directory
+        QDir dir(newDir);
+        if (dir.exists()) {
+            m_currentDirectory = dir.absolutePath();
             updatePrompt();
+        } else {
+            appendOutput("Error: Directory not found: " + newDir + "\n");
         }
     } else {
-        appendOutput("Error: Failed to cast backend to WindowsTerminalBackend.\n");
+        // Expand tilde in the command before executing
+        QString expandedCommand = command;
+        QString homePath = QDir::homePath();
+        
+        // Replace ~/ with home path (handles cases like "ls ~/Documents" or "cat ~/file.txt")
+        expandedCommand.replace("~/", homePath + "/");
+        
+        // Replace standalone ~ at start of command or after space (handles "ls ~" or "echo ~")
+        // Use word boundaries to avoid replacing ~ in the middle of other text
+        if (expandedCommand.startsWith("~")) {
+            // ~ at the start
+            if (expandedCommand.length() == 1 || expandedCommand.at(1).isSpace() || expandedCommand.at(1) == '/') {
+                expandedCommand.replace(0, 1, homePath);
+            }
+        } else {
+            // ~ after a space
+            expandedCommand.replace(QRegularExpression(R"((\s)~(\s|/|$))"), "\\1" + homePath + "\\2");
+        }
+        
+        // Execute the command with the current working directory using the interface
+        QString result = m_backend->executeCommand(expandedCommand, m_currentDirectory);
+        
+        // Append the result (even if empty, to show command was executed)
+        if (!result.isEmpty()) {
+            appendOutput(result);
+            if (!result.endsWith('\n')) {
+                appendOutput("\n");
+            }
+        } else {
+            // No output - might be a silent command, add a newline for spacing
+            appendOutput("\n");
+        }
+        
+        // Don't reset the directory - keep the tracked directory
+        // Only update if the command actually changed directories (handled by cd command)
+        updatePrompt();
     }
-#else
-    appendOutput("Error: WindowsTerminalBackend is only available on Windows.\n");
-#endif
 }
 
 void TerminalFrontend::appendOutput(const QString& text)
 {
     m_output += text;
-    update();
     
-    // Auto-scroll to bottom
+    // Calculate scroll range before updating
+    QFont font("Consolas", 10);
+    QFontMetrics fm(font);
+    int lineHeight = fm.height();
+    QRect viewportRect = viewport()->rect();
+    int inputHeight = m_inputContainer ? m_inputContainer->height() : 0;
+    int availableHeight = viewportRect.height() - inputHeight;
+    
+    int totalLines = 0;
+    if (!m_output.isEmpty()) {
+        totalLines = m_output.split('\n').count();
+    }
+    // No placeholder text - keep it blank when empty
+    int totalContentHeight = totalLines * lineHeight + 20;
+    
+    // Update scroll range
     QScrollBar* vbar = verticalScrollBar();
     if (vbar) {
+        vbar->setRange(0, qMax(0, totalContentHeight - availableHeight));
+        vbar->setPageStep(availableHeight);
+        vbar->setSingleStep(lineHeight);
+        
+        // Auto-scroll to bottom
         vbar->setValue(vbar->maximum());
     }
+    
+    update();
 }
 
 QString TerminalFrontend::getCurrentDirectory() const
 {
-#ifdef WIN32
-    wchar_t buffer[MAX_PATH];
-    DWORD length = GetCurrentDirectoryW(MAX_PATH, buffer);
-    if (length > 0 && length < MAX_PATH) {
-        return QString::fromWCharArray(buffer, length);
-    }
-#endif
-    // Fallback to QDir
+    // Use QDir for cross-platform directory retrieval
     return QDir::currentPath();
 }
 
@@ -288,9 +342,8 @@ void TerminalFrontend::paintEvent(QPaintEvent* event)
     int totalLines = 0;
     if (!m_output.isEmpty()) {
         totalLines = m_output.split('\n').count();
-    } else {
-        totalLines = 1; // Placeholder text
     }
+    // No placeholder text - keep it blank when empty
     int totalContentHeight = totalLines * lineHeight + 20; // Add some padding
     
     // Set up scroll area range
@@ -309,29 +362,28 @@ void TerminalFrontend::paintEvent(QPaintEvent* event)
         int y = lineHeight - scrollOffset;
         int x = 10;
         
+        // Get text color based on theme
+        QColor normalTextColor;
+        QPalette palette = this->palette();
+        normalTextColor = palette.color(QPalette::Text);
+        
         // Split output into lines and draw each line
         QStringList lines = m_output.split('\n');
         for (const QString& line : lines) {
             // Only draw if line is within visible area
             if (y + lineHeight >= 0 && y <= availableHeight) {
-                // Use red color for error messages, yellow for warnings, normal gray for regular output
+                // Use red color for error messages, yellow for warnings, theme-appropriate color for regular output
                 if (line.contains("Error:", Qt::CaseInsensitive)) {
                     painter.setPen(QColor(244, 67, 54)); // Red for errors
                 } else if (line.contains("Warning:", Qt::CaseInsensitive)) {
                     painter.setPen(QColor(255, 193, 7)); // Yellow/amber for warnings
                 } else {
-                    painter.setPen(QColor(212, 212, 212)); // Light gray for normal output
+                    painter.setPen(normalTextColor); // Use theme-appropriate text color
                 }
                 painter.drawText(x, y, line);
             }
             y += lineHeight;
         }
-    } else {
-        // Draw placeholder text if no output
-        int y = 20 - scrollOffset;
-        if (y >= 0 && y <= availableHeight) {
-            painter.setPen(QColor(212, 212, 212)); // Light gray
-            painter.drawText(10, y, "Terminal ready...");
-        }
     }
+    // Don't draw anything when output is empty - keep it blank
 }

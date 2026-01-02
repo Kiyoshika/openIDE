@@ -43,6 +43,7 @@ public:
     openide::terminal::TerminalFrontend& getTerminalFrontend();
     void setProjectTitle(const QString& projectName);
     QString getCurrentProjectRoot() const { return m_currentProjectRoot; }
+    void updateSplitterStyles(bool isDarkTheme);
     ~MainWindow();
 
 private slots:

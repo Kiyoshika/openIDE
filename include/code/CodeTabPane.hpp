@@ -34,6 +34,7 @@ public:
   bool fileIsOpen(const QString& path) const;
   void updateAllEditorsTheme(bool isDarkTheme);
   void updateAllEditorsSettings(openide::AppSettings* settings);
+  void updateAllSplitterStyles(bool isDarkTheme);
   
   // For compatibility with external code expecting QTabWidget interface
   int count() const;
